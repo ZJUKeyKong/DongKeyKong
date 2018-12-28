@@ -6,7 +6,12 @@ create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports {cl
 set_property -dict {PACKAGE_PIN N18       IOSTANDARD LVCMOS33} [get_ports {ps2c}];
 set_property -dict {PACKAGE_PIN M19 IOSTANDARD LVCMOS33} [get_ports {ps2d}];
  
-set_property -dict {PACKAGE_PIN W23   IOSTANDARD LVCMOS33} [get_ports {led}];
+set_property -dict {PACKAGE_PIN W23   IOSTANDARD LVCMOS33} [get_ports {led[0]}];
+set_property -dict {PACKAGE_PIN AB26   IOSTANDARD LVCMOS33} [get_ports {led[1]}];
+set_property -dict {PACKAGE_PIN Y25   IOSTANDARD LVCMOS33} [get_ports {led[2]}];
+set_property -dict {PACKAGE_PIN AA23   IOSTANDARD LVCMOS33} [get_ports {led[3]}];
+set_property -dict {PACKAGE_PIN AE21   IOSTANDARD LVCMOS33} [get_ports {led[4]}];
+set_property -dict {PACKAGE_PIN AF24   IOSTANDARD LVCMOS33} [get_ports {led[5]}];
 
 set_property -dict {PACKAGE_PIN T20       IOSTANDARD LVCMOS33} [get_ports {b[0]}]; 
 set_property -dict {PACKAGE_PIN R20       IOSTANDARD LVCMOS33} [get_ports {b[1]}];

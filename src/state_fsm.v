@@ -5,12 +5,14 @@ module state_fsm(
     input wire start,
     input wire restart,
     input wire over,
+    input wire success,
     output reg [1:0] state
     );
 
     localparam GAME_INITIAL = 2'b00,
                GAME_RUNNING = 2'b01,
-               GAME_OVER    = 2'b02;
+               GAME_OVER    = 2'b10,
+               GAME_SUCCESS = 2'b11;
 
     reg [1:0] next_state;
 
@@ -36,10 +38,18 @@ module state_fsm(
                 else if (restart) begin
                     next_state = GAME_INITIAL;
                 end
+                else if (success) begin
+                    next_state = GAME_SUCCESS;
+                end
             end
             GAME_OVER: begin
                 if (restart) begin
-                    next_state = GAME_OVER;
+                    next_state = GAME_INITIAL;
+                end
+            end
+            GAME_SUCCESS: begin
+                if(restart) begin
+                    next_state = GAME_INITIAL;
                 end
             end
         endcase

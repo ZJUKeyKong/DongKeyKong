@@ -9,7 +9,7 @@ module clkdiv(
     
     always @ (posedge clk) begin
         if(rst == 1'b1) begin
-            counter = 0;
+            counter <= 0;
         end
         else begin
             counter <= counter + 1;

@@ -19,14 +19,16 @@ module top(
 
 	localparam GAME_INITIAL = 2'b00,
                GAME_RUNNING = 2'b01,
-               GAME_OVER    = 2'b02;
+               GAME_OVER    = 2'b10,
+               GAME_SUCCESS = 2'b11;
 	
-	wire start, over, restart;
+	wire start, over, restart, success;
 	wire [1:0] cur_state;
 
 	assign start = 1'b1;
 	assign over = 1'b0;
 	assign restart = 1'b0;
+	assign success = 1'b0;
 	
 	wire [9:0] x;
 	wire [8:0] y;
@@ -35,13 +37,13 @@ module top(
 	clkdiv GenClk(.clk(clk), .clk_div(clk_div));
 
 	VGA_driver VGADisplay(.vga_clk(clk_div[1]), .data(vga_data), 
-						   .x(x), y(y), .hs(hs), .vs(vs),
+						   .x(x), .y(y), .hs(hs), .vs(vs),
 						   .r(r), .g(g), .b(b));
 
 	Seg7_driver NumberDisplay(.clk(clk), .seg_clk(clk_div[20]), .data(seg_data),
 			.SEG_CLK(SEG_CLK), .SEG_SOUT(SEG_SOUT), .SEG_PEN(SEG_PEN), .SEG_CLRN(SEG_CLRN));
 
-	state_fsm StateControl(.clk(clk), .start(start), .restart(restart), .over(over), .state(cur_state));
+	state_fsm StateControl(.clk(clk), .start(start), .restart(restart), .over(over), .success(success), .state(cur_state));
 
 	wire [11:0] background_img;
 
@@ -61,6 +63,9 @@ module top(
 			end
 			GAME_OVER: begin
 				vga_data <= background_img;
+			end
+			GAME_SUCCESS: begin
+				vga_data <= 12'h00_F;
 			end
 		endcase
 	end

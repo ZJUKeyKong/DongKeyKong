@@ -11,7 +11,8 @@ module display_scene(
 
     localparam GAME_INITIAL = 2'b00,
                GAME_RUNNING = 2'b01,
-               GAME_OVER    = 2'b02;
+               GAME_OVER    = 2'b10,
+               GAME_SUCCESS = 2'b11;
 
 
 

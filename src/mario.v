@@ -42,7 +42,7 @@ module mario(
                RIGHT_BOARD = 10'd590;
     
     localparam MARIO_INITIAL_X = 100,
-               MARIO_INITIAL_Y = 400;
+               MARIO_INITIAL_Y = 430;
 
     localparam MOVSPEED_X = 3'd5,
                MOVSPEED_Y = 3'd5,
@@ -69,7 +69,7 @@ module mario(
 
     wire COLLATION_LEFT, COLLATION_RIGHT, COLLATION_DOWN, COLLATION_UP;
     
-    wire KEYUP, KEYDOWN, KEYLEFT, KEYRIGHT;
+    wire KEYUP, KEYDOWN, KEYLEFT, KEYRIGHT, KEYJUMP;
 
     wire EN_CLAMP_DOWN, EN_CLAMP_UP;
 
@@ -89,8 +89,8 @@ module mario(
 
 //--------------------    End    ----------------------
 
-    reg [2:0] SPEED_X;
-    reg [2:0] SPEED_Y;
+    reg signed [9:0] SPEED_X;
+    reg signed [8:0] SPEED_Y;
 
     reg [2:0] next_state;
     reg [4:0] animation_counter;
@@ -98,8 +98,8 @@ module mario(
     initial begin
         x = MARIO_INITIAL_X;
         y = MARIO_INITIAL_Y;
-        SPEED_X = 2'b00;
-        SPEED_Y = 2'b00;
+        SPEED_X = 0;
+        SPEED_Y = 0;
         state = MARIO_INITIAL;
         next_state = MARIO_INITIAL;
         animation_state = MARIO_STAND;
@@ -142,6 +142,8 @@ module mario(
                 animation_counter <= animation_counter + 1'b1;
                 x <= x + SPEED_X;
                 SPEED_Y <= 0;
+                if(KEYLEFT) SPEED_X <= -MOVSPEED_X;
+                else SPEED_X <= MOVSPEED_X;
                 if(x < LEFT_BOARD) x <= LEFT_BOARD;
                 else if(x > RIGHT_BOARD) x <= RIGHT_BOARD;
             end
@@ -216,54 +218,28 @@ module mario(
         next_state = state;
         case(state)
             MARIO_INITIAL: begin
-                if(start & ~rst) begin
-                    next_state = MARIO_STANDING;
-                end
+                if(start & (~rst)) next_state = MARIO_STANDING;
                 else next_state = MARIO_INITIAL;
             end
             MARIO_JUMPING: begin
-                if(rst) begin
-                    next_state = MARIO_INITIAL;
-                end
-                else if(over) begin
-                    next_state = MARIO_DYING;
-                end
+                if(rst) next_state = MARIO_INITIAL;
+                else if(over) next_state = MARIO_DYING;
                 else next_state = MARIO_FLYING;
             end
             MARIO_FLYING: begin
-                if(rst) begin
-                    next_state = MARIO_INITIAL;
-                end
-                else if(over) begin
-                    next_state = MARIO_DYING;
-                end
-                else if(COLLATION_DOWN) begin
-                    next_state = MARIO_STANDING;
-                end
+                if(rst) next_state = MARIO_INITIAL;
+                else if(over) next_state = MARIO_DYING;
+                else if(COLLATION_DOWN & (SPEED_Y >= 0)) next_state = MARIO_STANDING;
                 else next_state = MARIO_FLYING;
             end
             MARIO_WALKING: begin
-                if(rst) begin
-                    next_state = MARIO_INITIAL;
-                end
-                else if(over) begin
-                    next_state = MARIO_DYING;
-                end
-                else if(~COLLATION_DOWN) begin
-                    next_state = MARIO_FLYING;
-                end
-                else if(KEYJUMP) begin
-                    next_state = MARIO_JUMPING;
-                end
-                else if(KEYUP & EN_CLAMP_UP) begin
-                    next_state = MARIO_CLAMPING;
-                end
-                else if(KEYDOWN & EN_CLAMP_DOWN) begin
-                    next_state = MARIO_CLAMPING;
-                end
-                else if((~KEYLEFT) & (~KEYRIGHT)) begin
-                    next_state = MARIO_STANDING;
-                end
+                if(rst) next_state = MARIO_INITIAL;
+                else if(over) next_state = MARIO_DYING;
+                else if(~COLLATION_DOWN) next_state = MARIO_FLYING;
+                else if(KEYJUMP) next_state = MARIO_JUMPING;
+                else if(KEYUP & EN_CLAMP_UP) next_state = MARIO_CLAMPING;
+                else if(KEYDOWN & EN_CLAMP_DOWN) next_state = MARIO_CLAMPING;
+                else if((~KEYLEFT) & (~KEYRIGHT)) next_state = MARIO_STANDING;
                 else next_state = MARIO_WALKING;
             end
             MARIO_STANDING: begin

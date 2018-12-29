@@ -20,31 +20,30 @@
 //////////////////////////////////////////////////////////////////////////////////
 module color(
 	input wire clk,
-	input wire[8:0] row,
-	input wire[9:0] col,
 	input wire[8:0] posY,
 	input wire[9:0] posX,
 	output reg[11:0] ocolor
     );
 
-wire[23:0] load;
-wire[11:0] address;
+	// wire[23:0] load;
+	// wire[11:0] address;
 
-localparam height = 64;
-localparam width = 64;
+	localparam height = 64;
+	localparam width = 64;
 
+	localparam TOP_BOARD = 9'd50,
+               BOTTOM_BOARD = 9'd430,
+               LEFT_BOARD = 10'd50,
+               RIGHT_BOARD = 10'd590;
 
-//IP core storing the image
-img2 load_color(.a(address), .spo(load));
-assign address = (row - posY) * width + (col - posX);
-always@(posedge clk)
-begin
-	if(col >= posX & col < posX + width  & row >=  posY & row < posY + height)
+	//IP core storing the image
+	// img2 load_color(.a(address), .spo(load));
+	// assign address = (row - posY) * width + (col - posX);
+	always@(posedge clk)
 	begin
-		ocolor = {load[7:4],load[15:12],load[23:20]};
+		if(posY < TOP_BOARD | posY > BOTTOM_BOARD | posX < LEFT_BOARD | posX > RIGHT_BOARD) ocolor = 12'h000;
+		else if(x > 300 && x < 400) ocolor = 12'hF0_0;
+		else ocolor = 12'hFF_F;
 	end
-	else
-		ocolor = 12'hfff;
-end
 
 endmodule

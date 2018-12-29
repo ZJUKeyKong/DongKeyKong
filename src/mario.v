@@ -140,12 +140,14 @@ module mario(
             end
             MARIO_WALKING: begin
                 animation_counter <= animation_counter + 1'b1;
-                x <= x + SPEED_X;
                 SPEED_Y <= 0;
                 if(KEYLEFT) SPEED_X <= -MOVSPEED_X;
                 else SPEED_X <= MOVSPEED_X;
-                if(x < LEFT_BOARD) x <= LEFT_BOARD;
-                else if(x > RIGHT_BOARD) x <= RIGHT_BOARD;
+                if(x + SPEED_X < LEFT_BOARD)
+                    x <= LEFT_BOARD;
+                else if(x + SPEED_X > RIGHT_BOARD)
+                    x <= RIGHT_BOARD;
+                else x <= x + SPEED_X;
             end
             MARIO_STANDING: begin
                 SPEED_X <= 0;
@@ -160,8 +162,16 @@ module mario(
                 SPEED_Y <= 0;
                 if(KEYUP | KEYDOWN) begin
                     animation_counter <= animation_counter + 1'b1;
-                    if(KEYUP) y <= y - CLAMPSPEED;
-                    else y <= y + CLAMPSPEED;
+                    if(KEYUP) begin
+                        if(y - CLAMPSPEED < TOP_BOARD)
+                            y <= TOP_BOARD;
+                        else y <= y - CLAMPSPEED;
+                    end
+                    else begin
+                        if(y + CLAMPSPEED > BOTTOM_BOARD)
+                            y <= BOTTOM_BOARD;
+                        else y <= y + CLAMPSPEED;
+                    end
                 end
             end
         endcase
@@ -283,7 +293,7 @@ module mario(
                     if(KEYLEFT | KEYRIGHT)
                         next_state = MARIO_WALKING;
                     else
-                        next_state = MARIO_WALKING;
+                        next_state = MARIO_JUMPING;
                 end
                 else next_state = MARIO_CLAMPING;
             end

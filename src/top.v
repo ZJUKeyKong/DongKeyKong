@@ -4,7 +4,8 @@ module top(
 	input wire clk,
 	input wire rst,
 	input wire [4:0] btn,
-	
+	// input wire ps2c,
+	// input wire ps2d,
 	output wire [3:0] r, g, b,
 	output wire hs, vs,
 	output wire SEG_CLK,
@@ -16,7 +17,8 @@ module top(
 
 	wire [31:0] seg_data;
 	
-	assign seg_data = 32'h02_46_8A_CE;
+	//assign seg_data = 32'h02_46_8A_CE;
+	assign seg_data = {2'b00, mario_x, 3'b000, mario_y, 3'b000, btn};
 
 	localparam GAME_INITIAL = 2'b00,
                GAME_RUNNING = 2'b01,
@@ -48,6 +50,8 @@ module top(
 	VGA_driver VGADisplay(.vga_clk(clk_div[1]), .data(vga_data), 
 						   .x(x), .y(y), .hs(hs), .vs(vs),
 						   .r(r), .g(g), .b(b));
+
+	// key2state get_movement(.clk(clk), .rst(1'b0), .ps2c(ps2c), .ps2d(ps2d), .move_state(movement));
 
 	Seg7_driver NumberDisplay(.clk(clk), .seg_clk(clk_div[20]), .data(seg_data),
 			.SEG_CLK(SEG_CLK), .SEG_SOUT(SEG_SOUT), .SEG_PEN(SEG_PEN), .SEG_CLRN(SEG_CLRN));
@@ -91,14 +95,34 @@ module top(
 				.state(kong_state),
 				.animation_state(kong_animation));
 
+	wire [9:0] queue_x;
+	wire [8:0] queue_y;
+	wire queue_state;
+	wire queue_animation;
+	wire [9:0] queue_relative_x;
+	wire [8:0] queue_relative_y;
+
+	assign queue_relative_x = 30 + x - queue_x;
+	assign queue_relative_y = 50 + y - queue_y;
+
+	queue myQueue(.clk(clk_div[20]),
+				  .rst(cur_state == GAME_INITIAL), 
+				  .start(cur_state == GAME_RUNNING), 
+				  .over(cur_state == GAME_OVER),
+				  .x(queue_x), .y(queue_y),
+				  .state(queue_state),
+				  .animation_state(queue_animation));
+
 	wire [11:0] background_img;
 	wire [11:0] mario_img;
 	wire [11:0] kong_img;
+	wire [11:0] queue_img;
 
 	// assign background_img = 12'h0F_0;
 	color GetBackground(.clk(clk_div[1]), .posX(x), .posY(y), .ocolor(background_img));
 	debugblock Mariocolor(.clk(clk_div[1]), .cx(mario_x), .cy(mario_y), .posX(x), .posY(y), .state(mario_state), .ocolor(mario_img));
-	debugkong Kongcolor(.clk(clk_div[1]), .cx(kong_x), .cy(kong_y), .posX(x), .posY(y), .state(kong_state), .ocolor(kong_img));
+	debugkong Kongcolor(.clk(clk_div[1]), .cx(kong_x), .cy(kong_y), .posX(x), .posY(y), .state(kong_state), .animation_state(kong_animation), .ocolor(kong_img));
+	debugqueue Queuecolor(.clk(clk_div[1]), .cx(queue_x), .cy(queue_y), .posX(x), .posY(y), .state(queue_state), .animation_state(queue_animation), .ocolor(queue_img));
 
 	// display_scene SceneDisplay(.clk(clk), .scene_clk(clk_div[20]),
 	// 						   .x(x), .y(y), .cur_state(cur_state), 
@@ -112,6 +136,12 @@ module top(
 			GAME_RUNNING: begin
 				if(mario_relative_x >= 0 & mario_relative_x < 60 & mario_relative_y >= 0 & mario_relative_y < 80) begin
 					vga_data <= mario_img;
+				end
+				else if(kong_relative_x >= 0 & kong_relative_x < 120 & kong_relative_y >= 0 & kong_relative_y < 160) begin
+					vga_data <= kong_img;
+				end
+				else if(queue_relative_x >= 0 & queue_relative_x < 60 & queue_relative_y >= 0 & queue_relative_y < 100) begin
+					vga_data <= queue_img;
 				end
 				else begin
 					vga_data <= background_img;

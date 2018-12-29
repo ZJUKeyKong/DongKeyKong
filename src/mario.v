@@ -78,6 +78,12 @@ module mario(
     assign COLLATION_DOWN  = y >= BOTTOM_BOARD;
     assign COLLATION_UP    = y <= TOP_BOARD;
 
+    // localparam up =4'b0001, 
+    //            left = 4'b0010, 
+    //            right = 4'b0011, 
+    //            down = 4'b0100, 
+    //            jump = 4'b1000;
+
     assign KEYUP    = keydown[0];
     assign KEYLEFT  = keydown[1];
     assign KEYRIGHT = keydown[2];

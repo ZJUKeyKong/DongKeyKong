@@ -45,12 +45,12 @@ module kong(
                 animation_state = KONG_NORMAL;
             end
             KONG_PLAYING: begin
-                case (animation_counter[3:1]) begin
+                case (animation_counter[3:1])
                     3'b101: animation_state = KONG_GET;
                     3'b110: animation_state = KONG_HOLD;
                     3'b111: animation_state = KONG_DROP;
                     default: animation_state = KONG_NORMAL;
-                end
+                endcase
                 animation_counter <= animation_counter + 1'b1;
             end
         endcase

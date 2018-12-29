@@ -113,17 +113,36 @@ module top(
 				  .state(queue_state),
 				  .animation_state(queue_animation));
 
+	wire [9:0] barrel_x;
+	wire [8:0] barrel_y;
+	wire [1:0] barrel_state;
+    wire [2:0] barrel_animation;
+	wire [9:0] barrel_relative_x;
+	wire [8:0] barrel_relative_y;
+
+	assign barrel_relative_x = 20 + x - barrel_x;
+	assign barrel_relative_y = 30 + y - barrel_y;
+
+	barrel myBarrel(.clk(clk_div[20]),
+				    .rst(cur_state == GAME_INITIAL), 
+				    .start(cur_state == GAME_RUNNING), 
+				    .over(cur_state == GAME_OVER),
+					.x(barrel_x), .y(barrel_y),
+					.state(barrel_state),
+					.animation_state(barrel_animation));
+
 	wire [11:0] background_img;
 	wire [11:0] mario_img;
 	wire [11:0] kong_img;
 	wire [11:0] queue_img;
+	wire [11:0] barrel_img;
 
 	// assign background_img = 12'h0F_0;
 	color GetBackground(.clk(clk_div[1]), .posX(x), .posY(y), .ocolor(background_img));
 	debugblock Mariocolor(.clk(clk_div[1]), .cx(mario_x), .cy(mario_y), .posX(x), .posY(y), .state(mario_state), .ocolor(mario_img));
 	debugkong Kongcolor(.clk(clk_div[1]), .cx(kong_x), .cy(kong_y), .posX(x), .posY(y), .state(kong_state), .animation_state(kong_animation), .ocolor(kong_img));
 	debugqueue Queuecolor(.clk(clk_div[1]), .cx(queue_x), .cy(queue_y), .posX(x), .posY(y), .state(queue_state), .animation_state(queue_animation), .ocolor(queue_img));
-
+	debugbarrel Barrelcolor(.clk(clk_div[1]), .cx(barrel_x), .cy(barrel_y), .posX(x), .posY(y), .state(barrel_state), .animation_state(barrel_animation), .ocolor(barrel_img));
 	// display_scene SceneDisplay(.clk(clk), .scene_clk(clk_div[20]),
 	// 						   .x(x), .y(y), .cur_state(cur_state), 
 	// 						   .color(background_img));
@@ -142,6 +161,9 @@ module top(
 				end
 				else if(queue_relative_x >= 0 & queue_relative_x < 60 & queue_relative_y >= 0 & queue_relative_y < 100) begin
 					vga_data <= queue_img;
+				end
+				else if(barrel_relative_x >= 0 & barrel_relative_x < 40 & barrel_relative_y >= 0 & barrel_relative_y < 60) begin
+					vga_data <= barrel_img;
 				end
 				else begin
 					vga_data <= background_img;

@@ -44,7 +44,7 @@ vgac vga_m(.d_in(color), .vga_clk(clk_div[1]), .clrn(1'b1), .row_addr(row), .col
 
 color color_m(.clk(clk), .row(row), .col(col), .posX(posx),.posY(posy), .ocolor(color));
 
-key2state get_movement(.clk(clk), .rst(1'b0), .ps2c(ps2c), .ps2d(ps2d), .move_state(movement), .out(data));
+key2state get_movement(.clk(clk), .rst(1'b0), .ps2c(ps2c), .ps2d(ps2d), .move_state(movement), .out(data), .done(done));
 
 SSeg7_Dev seg7(.clk(clk), .rst(1'b0), .Start(clk_div[20]), .SW0(1'b1), .flash(1'b0),
      .Hexs(dis_data),  .point(8'h00), .LES(8'hff), 

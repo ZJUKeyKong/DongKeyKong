@@ -58,11 +58,11 @@ module top(
 	wire [8:0] mario_y;
 	wire [2:0] mario_state;
 	wire [3:0] mario_animation;
-	wire [9:0] relative_x;
-    wire [8:0] relative_y;
+	wire [9:0] mario_relative_x;
+    wire [8:0] mario_relative_y;
 
-    assign relative_x = 30 + x - mario_x;
-    assign relative_y = 40 + y - mario_y;
+    assign mario_relative_x = 30 + x - mario_x;
+    assign mario_relative_y = 40 + y - mario_y;
 
 	mario myMario(.clk(clk_div[20]), 
 				  .rst(cur_state == GAME_INITIAL), 
@@ -73,12 +73,32 @@ module top(
 				  .state(mario_state), 
 				  .animation_state(mario_animation));
 
+	wire [9:0] kong_x;
+	wire [8:0] kong_y;
+	wire kong_state;
+	wire [1:0] kong_animation;
+	wire [9:0] kong_relative_x;
+	wire [8:0] kong_relative_y;
+
+	assign kong_relative_x = 60 + x - kong_x;
+	assign kong_relative_y = 80 + y - kong_y;
+
+	kong myKong(.clk(clk_div[20]),
+				.rst(cur_state == GAME_INITIAL), 
+				.start(cur_state == GAME_RUNNING), 
+				.over(cur_state == GAME_OVER),
+				.x(kong_x), .y(kong_y),
+				.state(kong_state),
+				.animation_state(kong_animation));
+
 	wire [11:0] background_img;
 	wire [11:0] mario_img;
+	wire [11:0] kong_img;
 
 	// assign background_img = 12'h0F_0;
 	color GetBackground(.clk(clk_div[1]), .posX(x), .posY(y), .ocolor(background_img));
 	debugblock Mariocolor(.clk(clk_div[1]), .cx(mario_x), .cy(mario_y), .posX(x), .posY(y), .state(mario_state), .ocolor(mario_img));
+	debugkong Kongcolor(.clk(clk_div[1]), .cx(kong_x), .cy(kong_y), .posX(x), .posY(y), .state(kong_state), .ocolor(kong_img));
 
 	// display_scene SceneDisplay(.clk(clk), .scene_clk(clk_div[20]),
 	// 						   .x(x), .y(y), .cur_state(cur_state), 
@@ -90,7 +110,7 @@ module top(
 				vga_data <= 12'hF0_0;
 			end
 			GAME_RUNNING: begin
-				if(relative_x >= 0 & relative_x < 60 & relative_y >= 0 & relative_y < 80) begin
+				if(mario_relative_x >= 0 & mario_relative_x < 60 & mario_relative_y >= 0 & mario_relative_y < 80) begin
 					vga_data <= mario_img;
 				end
 				else begin

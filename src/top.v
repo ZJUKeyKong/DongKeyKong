@@ -72,8 +72,8 @@ module top(
 	wire [9:0] mario_relative_x;
     wire [8:0] mario_relative_y;
 
-    assign mario_relative_x = (mario_width  >> 1) + x - mario_x;
-    assign mario_relative_y = (mario_height >> 1) + y - mario_y;
+    assign mario_relative_x = x - mario_x;
+    assign mario_relative_y = y - mario_y;
 
 	mario myMario(.clk(clk_div[20]), 
 				  .rst(cur_state == GAME_INITIAL), 

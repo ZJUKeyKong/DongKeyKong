@@ -31,14 +31,14 @@ module debugblock(
     wire [9:0] relative_x;
     wire [8:0] relative_y;
 
-    assign relative_x = (width  >> 1) + posX - cx;
-    assign relative_y = (height >> 1) + posY - cy;
+    assign relative_x = posX - cx;
+    assign relative_y = posY - cy;
 	//IP core storing the image
 	// img2 load_color(.a(address), .spo(load));
 	// assign address = (row - posY) * width + (col - posX);
 	always@(posedge clk)
 	begin
-		if(relative_x >= 0 && relative_x <= 60 && relative_y >= 0 && relative_y <= 80) begin
+		if(relative_x >= 0 && relative_x <= width && relative_y >= 0 && relative_y <= height) begin
             ocolor = {state[2], state[2], state[2], state[2], state[1], state[1], state[1], state[1], state[0], state[0], state[0], state[0]};
         end
 		else ocolor = 12'hFF_F;

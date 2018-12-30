@@ -36,13 +36,45 @@ module mario(
                MARIO_DIE3        = 4'b1100,
                MARIO_DIE4        = 4'b1101;
 
-    localparam TOP_BOARD = 9'd50,
-               BOTTOM_BOARD = 9'd430,
-               LEFT_BOARD = 10'd50,
-               RIGHT_BOARD = 10'd590;
+    localparam TOP_BOARD = 9'd5,
+               BOTTOM_BOARD = 9'd461,
+               LEFT_BOARD = 10'd5,
+               RIGHT_BOARD = 10'd640;
     
-    localparam MARIO_INITIAL_X = 136,
-               MARIO_INITIAL_Y = 438;
+    localparam land0lx = 10'd250,
+               land0ly = 9'd53,
+               land0rx = 10'd388,
+               land0ry = 9'd70,
+               land1lx = 10'd0,
+               land1ly = 9'd114,
+               land1rx = 10'd593,
+               land1ry = 9'd133,
+               land2lx = 10'd46,
+               land2ly = 9'd169,
+               land2rx = 10'd640,
+               land2ry = 9'd187,
+               land3lx = 10'd0,
+               land3ly = 9'd243,
+               land3rx = 10'd592,
+               land3ry = 9'd261,
+               land4lx = 10'd45,
+               land4ly = 9'd315,
+               land4rx = 10'd640,
+               land4ry = 9'd334,
+               land5lx = 10'd0,
+               land5ly = 9'd388,
+               land5rx = 10'd592,
+               land5ry = 9'd406,
+               land6lx = 10'd0,
+               land6ly = 9'd461,
+               land6rx = 10'd640,
+               land6ry = 9'd479;
+    
+    localparam MARIO_INITIAL_X = 10'd136,
+               MARIO_INITIAL_Y = 9'd425;
+
+    localparam MARIO_HEIGHT = 9'd36,
+	           MARIO_WIDTH  = 10'd34;
 
     localparam MOVSPEED_X = 3'd5,
                MOVSPEED_Y = 3'd5,
@@ -73,10 +105,38 @@ module mario(
 
     wire EN_CLAMP_DOWN, EN_CLAMP_UP;
 
-    assign COLLATION_RIGHT = x >= RIGHT_BOARD;
-    assign COLLATION_LEFT  = x <= LEFT_BOARD;
-    assign COLLATION_DOWN  = y >= BOTTOM_BOARD;
-    assign COLLATION_UP    = y <= TOP_BOARD;
+    assign COLLATION_RIGHT = (x + MARIO_WIDTH  >= RIGHT_BOARD) |
+                             (y < land0ry & y + MARIO_HEIGHT > land0ly) & (x + MARIO_WIDTH >= land0lx & x + MARIO_WIDTH <= land0rx) |
+                             (y < land1ry & y + MARIO_HEIGHT > land1ly) & (x + MARIO_WIDTH >= land1lx & x + MARIO_WIDTH <= land1rx) |
+                             (y < land2ry & y + MARIO_HEIGHT > land2ly) & (x + MARIO_WIDTH >= land2lx & x + MARIO_WIDTH <= land2rx) |
+                             (y < land3ry & y + MARIO_HEIGHT > land3ly) & (x + MARIO_WIDTH >= land3lx & x + MARIO_WIDTH <= land3rx) |
+                             (y < land4ry & y + MARIO_HEIGHT > land4ly) & (x + MARIO_WIDTH >= land4lx & x + MARIO_WIDTH <= land4rx) |
+                             (y < land5ry & y + MARIO_HEIGHT > land5ly) & (x + MARIO_WIDTH >= land5lx & x + MARIO_WIDTH <= land5rx) |
+                             (y < land6ry & y + MARIO_HEIGHT > land6ly) & (x + MARIO_WIDTH >= land6lx & x + MARIO_WIDTH <= land6rx);
+    assign COLLATION_LEFT  = (x <= LEFT_BOARD) |
+                             ((y < land0ry & y + MARIO_HEIGHT > land0ly) & (x >= land0lx & x <= land0rx)) |
+                             ((y < land1ry & y + MARIO_HEIGHT > land1ly) & (x >= land1lx & x <= land1rx)) |
+                             ((y < land2ry & y + MARIO_HEIGHT > land2ly) & (x >= land2lx & x <= land2rx)) |
+                             ((y < land3ry & y + MARIO_HEIGHT > land3ly) & (x >= land3lx & x <= land3rx)) |
+                             ((y < land4ry & y + MARIO_HEIGHT > land4ly) & (x >= land4lx & x <= land4rx)) |
+                             ((y < land5ry & y + MARIO_HEIGHT > land5ly) & (x >= land5lx & x <= land5rx)) |
+                             ((y < land6ry & y + MARIO_HEIGHT > land6ly) & (x >= land6lx & x <= land6rx));
+    assign COLLATION_DOWN  = (y + MARIO_HEIGHT >= BOTTOM_BOARD) | 
+                             ((x < land0rx & x + MARIO_WIDTH > land0lx) & (y + MARIO_HEIGHT >= land0ly & y + MARIO_HEIGHT <= land0ry)) |
+                             ((x < land1rx & x + MARIO_WIDTH > land1lx) & (y + MARIO_HEIGHT >= land1ly & y + MARIO_HEIGHT <= land1ry)) |
+                             ((x < land2rx & x + MARIO_WIDTH > land2lx) & (y + MARIO_HEIGHT >= land2ly & y + MARIO_HEIGHT <= land2ry)) |
+                             ((x < land3rx & x + MARIO_WIDTH > land3lx) & (y + MARIO_HEIGHT >= land3ly & y + MARIO_HEIGHT <= land3ry)) |
+                             ((x < land4rx & x + MARIO_WIDTH > land4lx) & (y + MARIO_HEIGHT >= land4ly & y + MARIO_HEIGHT <= land4ry)) |
+                             ((x < land5rx & x + MARIO_WIDTH > land5lx) & (y + MARIO_HEIGHT >= land5ly & y + MARIO_HEIGHT <= land5ry)) |
+                             ((x < land6rx & x + MARIO_WIDTH > land6lx) & (y + MARIO_HEIGHT >= land6ly & y + MARIO_HEIGHT <= land6ry));
+    assign COLLATION_UP    = (y <= TOP_BOARD) |
+                             ((x < land0rx & x + MARIO_WIDTH > land0lx) & (y >= land0ly & y <= land0ry)) |
+                             ((x < land1rx & x + MARIO_WIDTH > land1lx) & (y >= land1ly & y <= land1ry)) |
+                             ((x < land2rx & x + MARIO_WIDTH > land2lx) & (y >= land2ly & y <= land2ry)) |
+                             ((x < land3rx & x + MARIO_WIDTH > land3lx) & (y >= land3ly & y <= land3ry)) |
+                             ((x < land4rx & x + MARIO_WIDTH > land4lx) & (y >= land4ly & y <= land4ry)) |
+                             ((x < land5rx & x + MARIO_WIDTH > land5lx) & (y >= land5ly & y <= land5ry)) |
+                             ((x < land6rx & x + MARIO_WIDTH > land6lx) & (y >= land6ly & y <= land6ry));
 
     // localparam up =4'b0001, 
     //            left = 4'b0010, 
@@ -128,8 +188,64 @@ module mario(
                     y <= TOP_BOARD;
                     SPEED_Y <= 0;
                 end
-                else if(y + SPEED_Y > BOTTOM_BOARD) begin
-                    y <= BOTTOM_BOARD;
+                else if((y + SPEED_Y > land0ly & y + SPEED_Y < land0ry) & (x + SPEED_X < land0rx & x + SPEED_X + MARIO_WIDTH > land0lx)) begin
+                    y <= land0ry;
+                    SPEED_Y <= 0;
+                end
+                else if((y + SPEED_Y > land1ly & y + SPEED_Y < land1ry) & (x + SPEED_X < land1rx & x + SPEED_X + MARIO_WIDTH > land1lx)) begin
+                    y <= land1ry;
+                    SPEED_Y <= 0;
+                end
+                else if((y + SPEED_Y > land2ly & y + SPEED_Y < land2ry) & (x + SPEED_X < land2rx & x + SPEED_X + MARIO_WIDTH > land2lx)) begin
+                    y <= land2ry;
+                    SPEED_Y <= 0;
+                end
+                else if((y + SPEED_Y > land3ly & y + SPEED_Y < land3ry) & (x + SPEED_X < land3rx & x + SPEED_X + MARIO_WIDTH > land3lx)) begin
+                    y <= land3ry;
+                    SPEED_Y <= 0;
+                end
+                else if((y + SPEED_Y > land4ly & y + SPEED_Y < land4ry) & (x + SPEED_X < land4rx & x + SPEED_X + MARIO_WIDTH > land4lx)) begin
+                    y <= land4ry;
+                    SPEED_Y <= 0;
+                end
+                else if((y + SPEED_Y > land5ly & y + SPEED_Y < land5ry) & (x + SPEED_X < land5rx & x + SPEED_X + MARIO_WIDTH > land5lx)) begin
+                    y <= land5ry;
+                    SPEED_Y <= 0;
+                end
+                else if((y + SPEED_Y > land6ly & y + SPEED_Y < land6ry) & (x + SPEED_X < land6rx & x + SPEED_X + MARIO_WIDTH > land6lx)) begin
+                    y <= land6ry;
+                    SPEED_Y <= 0;
+                end
+                else if(y + MARIO_HEIGHT + SPEED_Y > BOTTOM_BOARD) begin
+                    y <= BOTTOM_BOARD - MARIO_HEIGHT;
+                    SPEED_Y <= 0;
+                end
+                else if((y + MARIO_HEIGHT + SPEED_Y > land0ly & y + MARIO_HEIGHT + SPEED_Y < land0ry) & (x + SPEED_X < land0rx & x + SPEED_X + MARIO_WIDTH > land0lx)) begin
+                    y <= land0ly - MARIO_HEIGHT;
+                    SPEED_Y <= 0;
+                end
+                else if((y + MARIO_HEIGHT + SPEED_Y > land1ly & y + MARIO_HEIGHT + SPEED_Y < land1ry) & (x + SPEED_X < land1rx & x + SPEED_X + MARIO_WIDTH > land1lx)) begin
+                    y <= land1ly - MARIO_HEIGHT;
+                    SPEED_Y <= 0;
+                end
+                else if((y + MARIO_HEIGHT + SPEED_Y > land2ly & y + MARIO_HEIGHT + SPEED_Y < land2ry) & (x + SPEED_X < land2rx & x + SPEED_X + MARIO_WIDTH > land2lx)) begin
+                    y <= land2ly - MARIO_HEIGHT;
+                    SPEED_Y <= 0;
+                end
+                else if((y + MARIO_HEIGHT + SPEED_Y > land3ly & y + MARIO_HEIGHT + SPEED_Y < land3ry) & (x + SPEED_X < land3rx & x + SPEED_X + MARIO_WIDTH > land3lx)) begin
+                    y <= land3ly - MARIO_HEIGHT;
+                    SPEED_Y <= 0;
+                end
+                else if((y + MARIO_HEIGHT + SPEED_Y > land4ly & y + MARIO_HEIGHT + SPEED_Y < land4ry) & (x + SPEED_X < land4rx & x + SPEED_X + MARIO_WIDTH > land4lx)) begin
+                    y <= land4ly - MARIO_HEIGHT;
+                    SPEED_Y <= 0;
+                end
+                else if((y + MARIO_HEIGHT + SPEED_Y > land5ly & y + MARIO_HEIGHT + SPEED_Y < land5ry) & (x + SPEED_X < land5rx & x + SPEED_X + MARIO_WIDTH > land5lx)) begin
+                    y <= land5ly - MARIO_HEIGHT;
+                    SPEED_Y <= 0;
+                end
+                else if((y + MARIO_HEIGHT + SPEED_Y > land6ly & y + MARIO_HEIGHT + SPEED_Y < land6ry) & (x + SPEED_X < land6rx & x + SPEED_X + MARIO_WIDTH > land6lx)) begin
+                    y <= land6ly - MARIO_HEIGHT;
                     SPEED_Y <= 0;
                 end
                 else y <= y + SPEED_Y;
@@ -137,8 +253,8 @@ module mario(
                     x <= LEFT_BOARD;
                     SPEED_X <= 0;
                 end
-                else if(x + SPEED_X > RIGHT_BOARD) begin
-                    x <= RIGHT_BOARD;
+                else if(x + MARIO_WIDTH + SPEED_X > RIGHT_BOARD) begin
+                    x <= RIGHT_BOARD - MARIO_WIDTH;
                     SPEED_X <= 0;
                 end
                 else x <= x + SPEED_X;
@@ -151,8 +267,8 @@ module mario(
                 else SPEED_X <= MOVSPEED_X;
                 if(x + SPEED_X < LEFT_BOARD)
                     x <= LEFT_BOARD;
-                else if(x + SPEED_X > RIGHT_BOARD)
-                    x <= RIGHT_BOARD;
+                else if(x + MARIO_WIDTH + SPEED_X > RIGHT_BOARD)
+                    x <= RIGHT_BOARD - MARIO_WIDTH;
                 else x <= x + SPEED_X;
             end
             MARIO_STANDING: begin
@@ -174,8 +290,8 @@ module mario(
                         else y <= y - CLAMPSPEED;
                     end
                     else begin
-                        if(y + CLAMPSPEED > BOTTOM_BOARD)
-                            y <= BOTTOM_BOARD;
+                        if(y + MARIO_HEIGHT + CLAMPSPEED > BOTTOM_BOARD)
+                            y <= BOTTOM_BOARD - MARIO_HEIGHT;
                         else y <= y + CLAMPSPEED;
                     end
                 end
@@ -295,11 +411,14 @@ module mario(
                 else if(over) begin
                     next_state = MARIO_DYING;
                 end
-                else if(COLLATION_DOWN & (KEYLEFT | KEYRIGHT | KEYJUMP)) begin
-                    if(KEYLEFT | KEYRIGHT)
-                        next_state = MARIO_WALKING;
-                    else
-                        next_state = MARIO_JUMPING;
+                else if(COLLATION_DOWN & KEYJUMP) begin
+                    next_state = MARIO_JUMPING;
+                end
+                else if(KEYLEFT & (~COLLATION_LEFT)) begin
+                    next_state = MARIO_WALKING;
+                end
+                else if(KEYRIGHT & (~COLLATION_RIGHT)) begin
+                    next_state = MARIO_WALKING;
                 end
                 else next_state = MARIO_CLAMPING;
             end

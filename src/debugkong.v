@@ -14,8 +14,8 @@ module debugkong(
 	// wire[23:0] load;
 	// wire[11:0] address;
 
-	localparam height = 160;
-	localparam width = 120;
+	localparam height = 72;
+	localparam width = 112;
 
     localparam KONG_INITIAL = 1'b0,
                KONG_PLAYING = 1'b1;
@@ -28,8 +28,8 @@ module debugkong(
     wire [9:0] relative_x;
     wire [8:0] relative_y;
 
-    assign relative_x = 60 + posX - cx;
-    assign relative_y = 80 + posY - cy;
+    assign relative_x = (width  >> 1) + posX - cx;
+    assign relative_y = (height >> 1) + posY - cy;
 	//IP core storing the image
 	// img2 load_color(.a(address), .spo(load));
 	// assign address = (row - posY) * width + (col - posX);

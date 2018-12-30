@@ -17,8 +17,8 @@ module queue(
     localparam QUEUE_LEFT  = 1'b0,
                QUEUE_RIGHT = 1'b1;
     
-    localparam QUEUE_INITIAL_X = 450,
-               QUEUE_INITIAL_Y = 150;
+    localparam QUEUE_INITIAL_X = 280,
+               QUEUE_INITIAL_Y = 27;
     
     reg next_state;
     reg [4:0] animation_counter;

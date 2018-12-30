@@ -41,8 +41,8 @@ module mario(
                LEFT_BOARD = 10'd50,
                RIGHT_BOARD = 10'd590;
     
-    localparam MARIO_INITIAL_X = 100,
-               MARIO_INITIAL_Y = 430;
+    localparam MARIO_INITIAL_X = 136,
+               MARIO_INITIAL_Y = 438;
 
     localparam MOVSPEED_X = 3'd5,
                MOVSPEED_Y = 3'd5,

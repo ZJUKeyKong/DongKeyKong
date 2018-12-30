@@ -58,6 +58,13 @@ module top(
 
 	state_fsm StateControl(.clk(clk), .start(start), .restart(restart), .over(over), .success(success), .state(cur_state));
 
+	localparam queue_width  = 44,
+           	   queue_height = 50,
+               kong_height  = 72,
+	           kong_width   = 112,
+               mario_height = 36,
+	           mario_width  = 34;
+
 	wire [9:0] mario_x;
 	wire [8:0] mario_y;
 	wire [2:0] mario_state;
@@ -65,8 +72,8 @@ module top(
 	wire [9:0] mario_relative_x;
     wire [8:0] mario_relative_y;
 
-    assign mario_relative_x = 30 + x - mario_x;
-    assign mario_relative_y = 40 + y - mario_y;
+    assign mario_relative_x = (mario_width  >> 1) + x - mario_x;
+    assign mario_relative_y = (mario_height >> 1) + y - mario_y;
 
 	mario myMario(.clk(clk_div[20]), 
 				  .rst(cur_state == GAME_INITIAL), 
@@ -84,8 +91,8 @@ module top(
 	wire [9:0] kong_relative_x;
 	wire [8:0] kong_relative_y;
 
-	assign kong_relative_x = 60 + x - kong_x;
-	assign kong_relative_y = 80 + y - kong_y;
+	assign kong_relative_x = (kong_width  >> 1) + x - kong_x;
+	assign kong_relative_y = (kong_height >> 1) + y - kong_y;
 
 	kong myKong(.clk(clk_div[20]),
 				.rst(cur_state == GAME_INITIAL), 
@@ -102,8 +109,8 @@ module top(
 	wire [9:0] queue_relative_x;
 	wire [8:0] queue_relative_y;
 
-	assign queue_relative_x = 30 + x - queue_x;
-	assign queue_relative_y = 50 + y - queue_y;
+	assign queue_relative_x = (queue_width  >> 1) + x - queue_x;
+	assign queue_relative_y = (queue_height >> 1) + y - queue_y;
 
 	queue myQueue(.clk(clk_div[20]),
 				  .rst(cur_state == GAME_INITIAL), 
@@ -153,13 +160,13 @@ module top(
 				vga_data <= 12'hF0_0;
 			end
 			GAME_RUNNING: begin
-				if(mario_relative_x >= 0 & mario_relative_x < 60 & mario_relative_y >= 0 & mario_relative_y < 80) begin
+				if(mario_relative_x >= 0 & mario_relative_x < mario_width & mario_relative_y >= 0 & mario_relative_y < mario_height) begin
 					vga_data <= mario_img;
 				end
-				else if(kong_relative_x >= 0 & kong_relative_x < 120 & kong_relative_y >= 0 & kong_relative_y < 160) begin
+				else if(kong_relative_x >= 0 & kong_relative_x < kong_width & kong_relative_y >= 0 & kong_relative_y < kong_height) begin
 					vga_data <= kong_img;
 				end
-				else if(queue_relative_x >= 0 & queue_relative_x < 60 & queue_relative_y >= 0 & queue_relative_y < 100) begin
+				else if(queue_relative_x >= 0 & queue_relative_x < queue_width & queue_relative_y >= 0 & queue_relative_y < queue_height) begin
 					vga_data <= queue_img;
 				end
 				else if(barrel_relative_x >= 0 & barrel_relative_x < 40 & barrel_relative_y >= 0 & barrel_relative_y < 60) begin

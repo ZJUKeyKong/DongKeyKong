@@ -19,8 +19,8 @@ module kong(
                KONG_HOLD   = 2'b10,
                KONG_DROP   = 2'b11;
     
-    localparam KONG_INITIAL_X = 150,
-               KONG_INITIAL_Y = 150;
+    localparam KONG_INITIAL_X = 127,
+               KONG_INITIAL_Y = 77;
     
     reg next_state;
     reg [4:0] animation_counter;

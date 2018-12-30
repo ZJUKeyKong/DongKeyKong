@@ -14,8 +14,8 @@ module debugqueue(
 	// wire[23:0] load;
 	// wire[11:0] address;
 
-	localparam height = 100;
-	localparam width = 60;
+	localparam height = 50;
+	localparam width = 44;
 
     localparam QUEUE_INITIAL = 1'b0,
                QUEUE_PLAYING = 1'b1;
@@ -26,8 +26,8 @@ module debugqueue(
     wire [9:0] relative_x;
     wire [8:0] relative_y;
 
-    assign relative_x = 30 + posX - cx;
-    assign relative_y = 50 + posY - cy;
+    assign relative_x = (width  >> 1) + posX - cx;
+    assign relative_y = (height >> 1) + posY - cy;
 	// IP core storing the image
 	// img2 load_color(.a(address), .spo(load));
 	// assign address = (row - posY) * width + (col - posX);

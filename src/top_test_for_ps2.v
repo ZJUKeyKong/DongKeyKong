@@ -4,9 +4,9 @@ output wire[3:0] r,
 output wire[3:0] g,
 output wire[3:0] b,
 output wire hs,vs,
-//output wire seg_clk,	//串行移位时钟
-//output wire seg_sout,	//七段显示数据(串行输出)
-//output wire SEG_PEN,	//七段码显示刷新使能
+//output wire seg_clk,	
+//output wire seg_sout,	
+//output wire SEG_PEN,	
 //output wire seg_clrn,
 output wire[5:0] led
 );

@@ -29,8 +29,8 @@ src 内为主要代码。
 |kong|112x72|
 |queue|44x50|
 |background|640x480|
-|barrelroll|42x22|
-|barrelfall|32x24|
+|barrelfall|42x24|
+|barrelroll|32x24|
 
 #### 楼梯判断
 人物中心像素线为基准，地图中梯子部分中心一定宽度进行标记，中心像素线与标记处重叠时判定可以上爬。

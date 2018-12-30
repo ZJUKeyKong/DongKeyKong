@@ -11,8 +11,10 @@ module debugbarrel(
 	output reg [11:0] ocolor
     );
 
-	localparam height = 60;
-	localparam width = 40;
+	localparam BARREL_FALL_WIDTH  = 42,
+               BARREL_FALL_HEIGHT = 24,
+               BARREL_ROLL_WIDTH  = 32,
+               BARREL_ROLL_HEIGHT = 24;
 
     localparam BARREL_INITIAL = 2'b00,
                BARREL_ROLLING = 2'b01,
@@ -25,17 +27,23 @@ module debugbarrel(
                BARREL_FALL1 = 3'b100,
                BARREL_FALL2 = 3'b101;
 
+    wire [9:0] barrel_width;
+	wire [8:0] barrel_height;
+
     wire [9:0] relative_x;
     wire [8:0] relative_y;
 
-    assign relative_x = 20 + posX - cx;
-    assign relative_y = 30 + posY - cy;
+    assign relative_x = posX - cx;
+    assign relative_y = posY - cy;
+
+	assign barrel_width  = (animation_state[2] == 0) ?  BARREL_ROLL_WIDTH : BARREL_FALL_WIDTH;
+	assign barrel_height = (animation_state[2] == 0) ? BARREL_ROLL_HEIGHT : BARREL_FALL_HEIGHT;
 	//IP core storing the image
 	// img2 load_color(.a(address), .spo(load));
 	// assign address = (row - posY) * width + (col - posX);
 	always@(posedge clk)
 	begin
-		if((state == BARREL_ROLLING || state == BARREL_FALLING) && relative_x >= 0 && relative_x <= width && relative_y >= 0 && relative_y <= height) begin
+		if((state == BARREL_ROLLING || state == BARREL_FALLING) && relative_x >= 0 && relative_x <= barrel_width && relative_y >= 0 && relative_y <= barrel_height) begin
             case (animation_state)
                 BARREL_ROLL1: ocolor = 12'h0F_F;
                 BARREL_ROLL2: ocolor = 12'h00_F;

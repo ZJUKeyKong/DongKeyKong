@@ -4,7 +4,7 @@ module kongColor(
     input wire[8:0] row,//scan signal from vgac
     input wire[9:0] posx,//the position of the left-up corner of Mario(col)
     input wire[8:0] posy,//the position of the left-up corner of Mario(row)
-    input wire[3:0] animate_state,
+    input wire[1:0] animate_state,
     output reg[15:0] color//the data reading from IP core
 );
 

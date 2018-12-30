@@ -12,7 +12,7 @@ module marioColor(
     
     wire is_display;
     wire[15:0] data[13:0];
-    wire[11:0] address;
+    wire[10:0] address;
     localparam[9:0] width = 34;
     localparam[8:0] height = 36;
     localparam[3:0] MARIO_STAND       = 4'b0000,

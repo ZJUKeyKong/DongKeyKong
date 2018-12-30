@@ -28,7 +28,7 @@ file = open(pathOutput, "w")
 file.write("memory_initialization_radix={0};\n".format(16))
 file.write("memory_initialization_vector=\n")
 for i in data :
-    value = hex(i[0])[2] + hex(i[1])[2] + hex(i[2])[2]
+    value = hex(i[2])[2] + hex(i[1])[2] + hex(i[0])[2]
     if i[3] == 0 :
         value = value + '0'
     else:

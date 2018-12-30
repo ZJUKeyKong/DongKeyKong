@@ -131,14 +131,14 @@ module top(
 					.state(barrel_state),
 					.animation_state(barrel_animation));
 
-	wire [11:0] background_img;
+	wire [15:0] background_img;
 	wire [11:0] mario_img;
 	wire [11:0] kong_img;
 	wire [11:0] queue_img;
 	wire [11:0] barrel_img;
 
 	// assign background_img = 12'h0F_0;
-	color GetBackground(.clk(clk_div[1]), .posX(x), .posY(y), .ocolor(background_img));
+	color GetBackground(.clk(clk), .cx(9'd320), .cy(8'd240), .posX(x), .posY(y), .ocolor(background_img));
 	debugblock Mariocolor(.clk(clk_div[1]), .cx(mario_x), .cy(mario_y), .posX(x), .posY(y), .state(mario_state), .ocolor(mario_img));
 	debugkong Kongcolor(.clk(clk_div[1]), .cx(kong_x), .cy(kong_y), .posX(x), .posY(y), .state(kong_state), .animation_state(kong_animation), .ocolor(kong_img));
 	debugqueue Queuecolor(.clk(clk_div[1]), .cx(queue_x), .cy(queue_y), .posX(x), .posY(y), .state(queue_state), .animation_state(queue_animation), .ocolor(queue_img));
@@ -165,8 +165,11 @@ module top(
 				else if(barrel_relative_x >= 0 & barrel_relative_x < 40 & barrel_relative_y >= 0 & barrel_relative_y < 60) begin
 					vga_data <= barrel_img;
 				end
+				else if (background_img == 16'hFF_FF)begin
+					vga_data <= 12'h00_0;
+				end
 				else begin
-					vga_data <= background_img;
+					vga_data <= background_img[15:4];
 				end
 			end
 			GAME_OVER: begin

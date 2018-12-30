@@ -28,7 +28,7 @@ module debugqueue(
 
     assign relative_x = 30 + posX - cx;
     assign relative_y = 50 + posY - cy;
-	//IP core storing the image
+	// IP core storing the image
 	// img2 load_color(.a(address), .spo(load));
 	// assign address = (row - posY) * width + (col - posX);
 	always@(posedge clk)

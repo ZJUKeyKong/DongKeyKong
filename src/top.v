@@ -3,9 +3,9 @@
 module top(
 	input wire clk,
 	input wire rst,
-	input wire [4:0] btn,
-	// input wire ps2c,
-	// input wire ps2d,
+	// input wire [4:0] btn,
+	input wire ps2c,
+	input wire ps2d,
 	output wire [3:0] r, g, b,
 	output wire hs, vs,
 	output wire SEG_CLK,
@@ -16,9 +16,10 @@ module top(
 	wire [31:0] clk_div;
 
 	wire [31:0] seg_data;
-	
+
+	wire [4:0] movement;
 	//assign seg_data = 32'h02_46_8A_CE;
-	assign seg_data = {2'b00, mario_x, 3'b000, mario_y, 3'b000, btn};
+	assign seg_data = {2'b00, mario_x, 3'b000, mario_y, 3'b000, movement};
 
 	localparam GAME_INITIAL = 2'b00,
                GAME_RUNNING = 2'b01,
@@ -39,13 +40,15 @@ module top(
 
 	clkdiv GenClk(.clk(clk), .clk_div(clk_div));
 
-	wire [4:0] btn_out;
+	// wire [4:0] btn_out;
 
-	pbdebounce pbd0(.clk_1ms(clk_div[17]), .button(btn[0]), .pbreg(btn_out[0]));
-	pbdebounce pbd1(.clk_1ms(clk_div[17]), .button(btn[1]), .pbreg(btn_out[1]));
-	pbdebounce pbd2(.clk_1ms(clk_div[17]), .button(btn[2]), .pbreg(btn_out[2]));
-	pbdebounce pbd3(.clk_1ms(clk_div[17]), .button(btn[3]), .pbreg(btn_out[3]));
-	pbdebounce pbd4(.clk_1ms(clk_div[17]), .button(btn[4]), .pbreg(btn_out[4]));
+	// pbdebounce pbd0(.clk_1ms(clk_div[17]), .button(btn[0]), .pbreg(btn_out[0]));
+	// pbdebounce pbd1(.clk_1ms(clk_div[17]), .button(btn[1]), .pbreg(btn_out[1]));
+	// pbdebounce pbd2(.clk_1ms(clk_div[17]), .button(btn[2]), .pbreg(btn_out[2]));
+	// pbdebounce pbd3(.clk_1ms(clk_div[17]), .button(btn[3]), .pbreg(btn_out[3]));
+	// pbdebounce pbd4(.clk_1ms(clk_div[17]), .button(btn[4]), .pbreg(btn_out[4]));
+
+	key2state get_movement(.clk(clk), .rst(1'b0), .ps2c(ps2c), .ps2d(ps2d), .move_state(movement));
 
 	VGA_driver VGADisplay(.vga_clk(clk_div[1]), .data(vga_data), 
 						   .x(x), .y(y), .hs(hs), .vs(vs),
@@ -79,7 +82,7 @@ module top(
 				  .rst(cur_state == GAME_INITIAL), 
 				  .start(cur_state == GAME_RUNNING), 
 				  .over(cur_state == GAME_OVER), 
-				  .keydown(btn_out), 
+				  .keydown(movement), 
 				  .x(mario_x), .y(mario_y), 
 				  .state(mario_state), 
 				  .animation_state(mario_animation));

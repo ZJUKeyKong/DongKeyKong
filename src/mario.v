@@ -24,9 +24,10 @@ module mario(
     localparam MARIO_STAND       = 4'b0000,
                MARIO_WALK_LEFT1  = 4'b0001,
                MARIO_WALK_LEFT2  = 4'b0010,
-               MARIO_WALK_MID    = 4'b0011,
+               MARIO_WALK_LEFT3  = 4'b0011,
                MARIO_WALK_RIGHT1 = 4'b0100,
                MARIO_WALK_RIGHT2 = 4'b0101,
+               MARIO_WALK_RIGHT3 = 4'b1110,
                MARIO_FLY_LEFT    = 4'b0110,
                MARIO_FLY_RIGHT   = 4'b0111,
                MARIO_CLAMP1      = 4'b1000,
@@ -49,7 +50,7 @@ module mario(
                land1ly = 9'd114,
                land1rx = 10'd593,
                land1ry = 9'd133,
-               land2lx = 10'd46,
+               land2lx = 10'd48,
                land2ly = 9'd169,
                land2rx = 10'd640,
                land2ry = 9'd187,
@@ -57,7 +58,7 @@ module mario(
                land3ly = 9'd243,
                land3rx = 10'd592,
                land3ry = 9'd261,
-               land4lx = 10'd45,
+               land4lx = 10'd48,
                land4ly = 9'd315,
                land4rx = 10'd640,
                land4ry = 9'd334,
@@ -160,6 +161,7 @@ module mario(
 
     reg [2:0] next_state;
     reg [4:0] animation_counter;
+    reg last_direction;
     
     initial begin
         x = MARIO_INITIAL_X;
@@ -170,6 +172,7 @@ module mario(
         next_state = MARIO_INITIAL;
         animation_state = MARIO_STAND;
         animation_counter = 0;
+        last_direction = 1'b0;
     end
 
     always@ (posedge clk) begin
@@ -263,8 +266,17 @@ module mario(
             MARIO_WALKING: begin
                 animation_counter <= animation_counter + 1'b1;
                 SPEED_Y <= 0;
-                if(KEYLEFT) SPEED_X <= -MOVSPEED_X;
-                else SPEED_X <= MOVSPEED_X;
+                if(KEYLEFT) begin
+                    SPEED_X <= -MOVSPEED_X;
+                    last_direction <= 1;
+                end
+                else if(KEYRIGHT) begin
+                    SPEED_X <= MOVSPEED_X;
+                    last_direction <= 0;
+                end
+                else begin
+                    SPEED_X <= MOVSPEED_X;
+                end
                 if(x + SPEED_X < LEFT_BOARD)
                     x <= LEFT_BOARD;
                 else if(x + MARIO_WIDTH + SPEED_X > RIGHT_BOARD)
@@ -309,17 +321,17 @@ module mario(
                 if(SPEED_X > 0) begin
                     case (animation_counter[2:1])
                         2'b00: animation_state = MARIO_WALK_RIGHT1;
-                        2'b01: animation_state = MARIO_WALK_MID;
+                        2'b01: animation_state = MARIO_WALK_RIGHT3;
                         2'b10: animation_state = MARIO_WALK_RIGHT2;
-                        2'b11: animation_state = MARIO_WALK_MID;
+                        2'b11: animation_state = MARIO_WALK_RIGHT3;
                     endcase
                 end
                 else begin
                     case (animation_counter[2:1])
                         2'b00: animation_state = MARIO_WALK_LEFT1;
-                        2'b01: animation_state = MARIO_WALK_MID;
+                        2'b01: animation_state = MARIO_WALK_LEFT3;
                         2'b10: animation_state = MARIO_WALK_LEFT2;
-                        2'b11: animation_state = MARIO_WALK_MID;
+                        2'b11: animation_state = MARIO_WALK_LEFT3;
                     endcase
                 end
             end
@@ -342,7 +354,7 @@ module mario(
                 end
                 // else animation_state = MARIO_CLAMP1;
             end
-            default: animation_state = MARIO_STAND;
+            default: animation_state = last_direction ? MARIO_WALK_LEFT3 : MARIO_WALK_RIGHT3;
         endcase
     end
 

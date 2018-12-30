@@ -138,7 +138,7 @@ module top(
 	barrel myBarrel(.clk(clk_div[20]),
 				    .rst(cur_state == GAME_INITIAL), 
 				    .start(cur_state == GAME_RUNNING), 
-				    .over(cur_state == GAME_OVER),
+				    .over((cur_state == GAME_OVER) | (barrel_x < 17 & barrel_y > 410)),
 					.x(barrel_x), .y(barrel_y),
 					.state(barrel_state),
 					.animation_state(barrel_animation));

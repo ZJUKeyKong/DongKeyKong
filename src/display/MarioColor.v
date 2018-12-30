@@ -11,16 +11,17 @@ module marioColor(
     );
     
     wire is_display;
-    wire[15:0] data[13:0];
+    wire[15:0] data[14:0];
     wire[10:0] address;
     localparam[9:0] width = 34;
     localparam[8:0] height = 36;
     localparam[3:0] MARIO_STAND       = 4'b0000,
                     MARIO_WALK_LEFT1  = 4'b0001,
                     MARIO_WALK_LEFT2  = 4'b0010,
-                    MARIO_WALK_MID    = 4'b0011,
+                    MARIO_WALK_LEFT3  = 4'b0011,
                     MARIO_WALK_RIGHT1 = 4'b0100,
                     MARIO_WALK_RIGHT2 = 4'b0101,
+                    MARIO_WALK_RIGHT3 = 4'b1110,
                     MARIO_FLY_LEFT    = 4'b0110,
                     MARIO_FLY_RIGHT   = 4'b0111,
                     MARIO_CLAMP1      = 4'b1000,
@@ -37,10 +38,11 @@ module marioColor(
     //ROM from which the module loads color
     MARIO_STAND_img m0(.a(address), .spo(data[0]));
     MARIO_WALK_LEFT1_img m1(.a(address), .spo(data[1]));
-    MARIO_WALK_LEFT_img m2(.a(address), .spo(data[2]));
-    MARIO_WALK_MID_img m3(.a(address), .spo(data[3]));
+    MARIO_WALK_LEFT2_img m2(.a(address), .spo(data[2]));
+    MARIO_WALK_LEFT3_img m3(.a(address), .spo(data[3]));
     MARIO_WALK_RIGHT1_img m4(.a(address), .spo(data[4]));
     MARIO_WALK_RIGHT2_img m5(.a(address), .spo(data[5]));
+    MARIO_WALK_RIGHT3_img m14(.a(address), .spo(data[14]));
     MARIO_FLY_LEFT_img m6(.a(address), .spo(data[6]));
     MARIO_FLY_RIGHT_img m7(.a(address), .spo(data[7]));
     MARIO_CLAMP1_img m8(.a(address), .spo(data[8]));
@@ -60,12 +62,14 @@ module marioColor(
                     color <= data[1];
                 MARIO_WALK_LEFT2:
                     color <= data[2];
-                MARIO_WALK_MID:
+                MARIO_WALK_LEFT3:
                     color <= data[3];
                 MARIO_WALK_RIGHT1:
                     color <= data[4];
                 MARIO_WALK_RIGHT2:
                     color <= data[5];
+                MARIO_WALK_RIGHT3:
+                    color <= data[14];
                 MARIO_FLY_LEFT:
                     color <= data[6];
                 MARIO_FLY_RIGHT:

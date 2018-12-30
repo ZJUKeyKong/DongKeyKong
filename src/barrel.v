@@ -60,16 +60,16 @@ module barrel(
     localparam BARREL_INITIAL_X = 10'd203,
                BARREL_INITIAL_Y =  9'd91;
 
-    localparam BARREL_FALL_WIDTH  = 42,
-               BARREL_FALL_HEIGHT = 24,
-               BARREL_ROLL_WIDTH  = 32,
-               BARREL_ROLL_HEIGHT = 24;
+    localparam BARREL_FALL_WIDTH  = 10'd42,
+               BARREL_FALL_HEIGHT = 9'd24,
+               BARREL_ROLL_WIDTH  = 10'd32,
+               BARREL_ROLL_HEIGHT = 9'd24;
 
     localparam MOVSPEED_X = 3'd3,
                MOVSPEED_Y = 3'd3,
                ACCELERATION_Y = 1'b1;
 
-    wire COLLATION_LEFT, COLLATION_RIGHT, COLLATION_DOWN;
+    wire COLLATION_DOWN;
 
     wire EN_FALL;
 
@@ -86,10 +86,10 @@ module barrel(
 
 //--------------------    End    ----------------------
 
-    reg signed [9:0] SPEED_X;
-    reg signed [8:0] SPEED_Y;
+    reg signed [10:0] SPEED_X;
+	reg signed [9:0] SPEED_Y;
 
-    reg [2:0] next_state;
+    reg [1:0] next_state;
     reg [4:0] animation_counter;
     
     initial begin
@@ -114,17 +114,17 @@ module barrel(
             end
             BARREL_ROLLING: begin
                 if(x + BARREL_ROLL_WIDTH + SPEED_X > RIGHT_BOARD) begin
-                    x <= RIGHT_BOARD;
+                    x <= RIGHT_BOARD - BARREL_ROLL_WIDTH;
+                    SPEED_X <= -MOVSPEED_X;
                 end
                 else if(x + SPEED_X < LEFT_BOARD) begin
                     x <= LEFT_BOARD;
+                    SPEED_X <= MOVSPEED_X;
                 end
                 else begin
                     x <= x + SPEED_X;
                 end
                 SPEED_Y <= 0;
-                if(COLLATION_RIGHT) SPEED_X <= -MOVSPEED_X;
-                else if(COLLATION_LEFT) SPEED_X <= MOVSPEED_X;
                 animation_counter <= animation_counter + 1'b1;
             end
             BARREL_FALLING: begin

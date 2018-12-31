@@ -67,25 +67,25 @@ module mario(
                land5rx = 10'd640,
                land5ry =  9'd479;
     
-    localparam ladder0lx = 10'd341,
+    localparam ladder0lx = 10'd339,
                ladder0ly =  9'd15,
-               ladder0rx = 10'd351,
+               ladder0rx = 10'd353,
                ladder0ry =  9'd81,
-               ladder1lx = 10'd543,
+               ladder1lx = 10'd541,
                ladder1ly =  9'd77,
-               ladder1rx = 10'd553,
+               ladder1rx = 10'd555,
                ladder1ry =  9'd163,
-               ladder2lx = 10'd50,
+               ladder2lx = 10'd48,
                ladder2ly =  9'd159,
-               ladder2rx = 10'd60,
+               ladder2rx = 10'd62,
                ladder2ry =  9'd252,
-               ladder3lx = 10'd548,
+               ladder3lx = 10'd546,
                ladder3ly =  9'd248,
-               ladder3rx = 10'd558,
+               ladder3rx = 10'd560,
                ladder3ry =  9'd342,
-               ladder4lx = 10'd55,
+               ladder4lx = 10'd53,
                ladder4ly =  9'd338,
-               ladder4rx = 10'd65,
+               ladder4rx = 10'd67,
                ladder4ry =  9'd427;
 
     localparam MARIO_INITIAL_X = 10'd450,
@@ -95,9 +95,9 @@ module mario(
 	           MARIO_WIDTH  = 10'd34;
 
     localparam MOVSPEED_X = 3'd5,
-               MOVSPEED_Y = 3'd5,
+               MOVSPEED_Y = 6'd50,
                CLAMPSPEED = 3'd3,
-               ACCELERATION_Y = 1'b1;
+               ACCELERATION_Y = 3'd2;
 
 //--------------------  to write ----------------------
 
@@ -180,7 +180,10 @@ module mario(
 //--------------------    End    ----------------------
 
     reg signed [9:0] SPEED_X;
-    reg signed [8:0] SPEED_Y;
+    wire signed [12:0] SPEED_Y;
+    reg signed [12:0] SPEED_Y10x;
+
+    assign SPEED_Y = SPEED_Y10x / 10;
 
     reg [2:0] next_state;
     reg [4:0] animation_counter;
@@ -190,7 +193,7 @@ module mario(
         x = MARIO_INITIAL_X;
         y = MARIO_INITIAL_Y;
         SPEED_X = 0;
-        SPEED_Y = 0;
+        SPEED_Y10x = 0;
         state = MARIO_INITIAL;
         next_state = MARIO_INITIAL;
         animation_state = MARIO_STAND;
@@ -206,65 +209,65 @@ module mario(
                 y <= MARIO_INITIAL_Y;
             end
             MARIO_JUMPING: begin
-                SPEED_Y <= -MOVSPEED_Y;
+                SPEED_Y10x <= -MOVSPEED_Y;
             end
             MARIO_FLYING: begin
                 animation_counter <= animation_counter + 1'b1;
                 if(y + SPEED_Y < TOP_BOARD) begin
                     y <= TOP_BOARD;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + SPEED_Y > land0ly & y + SPEED_Y < land0ry) & (x + SPEED_X < land0rx & x + SPEED_X + MARIO_WIDTH > land0lx)) begin
                     y <= land0ry;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + SPEED_Y > land1ly & y + SPEED_Y < land1ry) & (x + SPEED_X < land1rx & x + SPEED_X + MARIO_WIDTH > land1lx)) begin
                     y <= land1ry;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + SPEED_Y > land2ly & y + SPEED_Y < land2ry) & (x + SPEED_X < land2rx & x + SPEED_X + MARIO_WIDTH > land2lx)) begin
                     y <= land2ry;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + SPEED_Y > land3ly & y + SPEED_Y < land3ry) & (x + SPEED_X < land3rx & x + SPEED_X + MARIO_WIDTH > land3lx)) begin
                     y <= land3ry;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + SPEED_Y > land4ly & y + SPEED_Y < land4ry) & (x + SPEED_X < land4rx & x + SPEED_X + MARIO_WIDTH > land4lx)) begin
                     y <= land4ry;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + SPEED_Y > land5ly & y + SPEED_Y < land5ry) & (x + SPEED_X < land5rx & x + SPEED_X + MARIO_WIDTH > land5lx)) begin
                     y <= land5ry;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if(y + MARIO_HEIGHT + SPEED_Y > BOTTOM_BOARD) begin
                     y <= BOTTOM_BOARD - MARIO_HEIGHT;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + MARIO_HEIGHT + SPEED_Y > land0ly & y + MARIO_HEIGHT + SPEED_Y < land0ry) & (x + SPEED_X < land0rx & x + SPEED_X + MARIO_WIDTH > land0lx)) begin
                     y <= land0ly - MARIO_HEIGHT;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + MARIO_HEIGHT + SPEED_Y > land1ly & y + MARIO_HEIGHT + SPEED_Y < land1ry) & (x + SPEED_X < land1rx & x + SPEED_X + MARIO_WIDTH > land1lx)) begin
                     y <= land1ly - MARIO_HEIGHT;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + MARIO_HEIGHT + SPEED_Y > land2ly & y + MARIO_HEIGHT + SPEED_Y < land2ry) & (x + SPEED_X < land2rx & x + SPEED_X + MARIO_WIDTH > land2lx)) begin
                     y <= land2ly - MARIO_HEIGHT;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + MARIO_HEIGHT + SPEED_Y > land3ly & y + MARIO_HEIGHT + SPEED_Y < land3ry) & (x + SPEED_X < land3rx & x + SPEED_X + MARIO_WIDTH > land3lx)) begin
                     y <= land3ly - MARIO_HEIGHT;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + MARIO_HEIGHT + SPEED_Y > land4ly & y + MARIO_HEIGHT + SPEED_Y < land4ry) & (x + SPEED_X < land4rx & x + SPEED_X + MARIO_WIDTH > land4lx)) begin
                     y <= land4ly - MARIO_HEIGHT;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else if((y + MARIO_HEIGHT + SPEED_Y > land5ly & y + MARIO_HEIGHT + SPEED_Y < land5ry) & (x + SPEED_X < land5rx & x + SPEED_X + MARIO_WIDTH > land5lx)) begin
                     y <= land5ly - MARIO_HEIGHT;
-                    SPEED_Y <= 0;
+                    SPEED_Y10x <= 0;
                 end
                 else y <= y + SPEED_Y;
                 if(x + SPEED_X < LEFT_BOARD) begin
@@ -276,11 +279,11 @@ module mario(
                     SPEED_X <= 0;
                 end
                 else x <= x + SPEED_X;
-                SPEED_Y <= SPEED_Y + ACCELERATION_Y;
+                SPEED_Y10x <= SPEED_Y10x + ACCELERATION_Y;
             end
             MARIO_WALKING: begin
                 animation_counter <= animation_counter + 1'b1;
-                SPEED_Y <= 0;
+                SPEED_Y10x <= 0;
                 if(KEYLEFT) begin
                     SPEED_X <= -MOVSPEED_X;
                     last_direction <= 1;
@@ -300,15 +303,15 @@ module mario(
             end
             MARIO_STANDING: begin
                 SPEED_X <= 0;
-                SPEED_Y <= 0;
+                SPEED_Y10x <= 0;
             end
             MARIO_DYING: begin
                 SPEED_X <= 0;
-                SPEED_Y <= 0;
+                SPEED_Y10x <= 0;
             end
             MARIO_CLAMPING: begin
                 SPEED_X <= 0;
-                SPEED_Y <= 0;
+                SPEED_Y10x <= 0;
                 if(KEYUP | KEYDOWN) begin
                     animation_counter <= animation_counter + 1'b1;
                     if(KEYUP) begin
@@ -388,7 +391,7 @@ module mario(
             MARIO_FLYING: begin
                 if(rst) next_state = MARIO_INITIAL;
                 else if(over) next_state = MARIO_DYING;
-                else if(COLLATION_DOWN & (SPEED_Y >= 0)) next_state = MARIO_STANDING;
+                else if(COLLATION_DOWN & (SPEED_Y10x >= 0)) next_state = MARIO_STANDING;
                 else next_state = MARIO_FLYING;
             end
             MARIO_WALKING: begin

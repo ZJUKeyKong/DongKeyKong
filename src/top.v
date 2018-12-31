@@ -4,6 +4,7 @@ module top(
 	input wire clk,
 	input wire ps2c,
 	input wire ps2d,
+	input wire [1:0] SW,
 	output wire [3:0] r, g, b,
 	output wire hs, vs,
 	output wire SEG_CLK,
@@ -29,7 +30,7 @@ module top(
 
 	assign start = 1'b1;
 	assign over = 1'b0;
-	assign restart = 1'b0;
+	assign restart = SW[1];
 	assign success = 1'b0;
 	
 	wire [9:0] x;

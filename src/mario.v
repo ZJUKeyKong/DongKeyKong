@@ -94,8 +94,8 @@ module mario(
     localparam MARIO_HEIGHT = 9'd36,
 	           MARIO_WIDTH  = 10'd34;
 
-    localparam MOVSPEED_X = 3'd3,
-               MOVSPEED_Y = 6'd45,
+    localparam MOVSPEED_X = 3'd4,
+               MOVSPEED_Y = 6'd50,
                CLAMPSPEED = 3'd3,
                ACCELERATION_Y = 3'd3;
 
@@ -337,7 +337,7 @@ module mario(
             end
             MARIO_WALKING: begin
                 if(SPEED_X > 0) begin
-                    case (animation_counter[4:3])
+                    case (animation_counter[3:2])
                         2'b00: animation_state = MARIO_WALK_RIGHT1;
                         2'b01: animation_state = MARIO_WALK_RIGHT3;
                         2'b10: animation_state = MARIO_WALK_RIGHT2;
@@ -345,7 +345,7 @@ module mario(
                     endcase
                 end
                 else begin
-                    case (animation_counter[4:3])
+                    case (animation_counter[3:2])
                         2'b00: animation_state = MARIO_WALK_LEFT1;
                         2'b01: animation_state = MARIO_WALK_LEFT3;
                         2'b10: animation_state = MARIO_WALK_LEFT2;

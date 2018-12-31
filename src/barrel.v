@@ -82,9 +82,9 @@ module barrel(
                BARREL_ROLL_WIDTH  = 10'd32,
                BARREL_ROLL_HEIGHT = 9'd24;
 
-    localparam MOVSPEED_X = 3'd3,
-               MOVSPEED_Y = 3'd3,
-               ACCELERATION_Y = 1'b1;
+    localparam MOVSPEED_X = 3'd1,
+               MOVSPEED_Y = 3'd1,
+               accumulate_Y = 1'b0;
 
     wire COLLATION_DOWN;
     wire EN_FALL;
@@ -106,7 +106,7 @@ module barrel(
                      (x >= ladder4lx & x <= ladder4rx & y >= ladder4ly & y <= ladder4ry);
 
     rand_gen m20(.clk(clk), .rand(randnumber));
-    assign RAND_MATCH = randnumber[3:0] == 4'1010;
+    assign RAND_MATCH = randnumber[3:2] == 2'b10;
 
 //--------------------    End    ----------------------
 
@@ -184,7 +184,7 @@ module barrel(
                     y <= y + SPEED_Y;
                 end
                 // SPEED_X <= 0;
-                SPEED_Y <= SPEED_Y + ACCELERATION_Y;
+                SPEED_Y <= MOVSPEED_Y;
                 animation_counter <= animation_counter + 1'b1;
             end
         endcase

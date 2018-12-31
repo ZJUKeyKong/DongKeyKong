@@ -5,6 +5,7 @@ module kong(
     input wire rst,
     input wire start,
     input wire over,
+    output reg is_drop,
     output wire [9:0] x,
     output wire [8:0] y,
     output reg state,
@@ -46,10 +47,22 @@ module kong(
             end
             KONG_PLAYING: begin
                 case (animation_counter[6:4])
-                    3'b101: animation_state = KONG_GET;
-                    3'b110: animation_state = KONG_HOLD;
-                    3'b111: animation_state = KONG_DROP;
-                    default: animation_state = KONG_NORMAL;
+                    3'b101: begin
+                        is_drop = 0;
+                        animation_state = KONG_GET;
+                    end
+                    3'b110: begin
+                        is_drop = 0;
+                        animation_state = KONG_HOLD;
+                    end
+                    3'b111: begin
+                        is_drop = 1;
+                        animation_state = KONG_DROP;
+                    end
+                    default: begin
+                        is_drop = 0;
+                        animation_state = KONG_NORMAL;
+                    end
                 endcase
                 animation_counter <= animation_counter + 1'b1;
             end

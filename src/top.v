@@ -94,18 +94,19 @@ module top(
 	assign kong_relative_x = (kong_width  >> 1) + x - kong_x;
 	assign kong_relative_y = (kong_height >> 1) + y - kong_y;
 
+	wire is_drop;
+
 	kong myKong(.clk(clk_div[20]),
 				.rst(cur_state == GAME_INITIAL), 
 				.start(cur_state == GAME_RUNNING), 
 				.over(cur_state == GAME_OVER),
+				.is_drop(is_drop),
 				.x(kong_x), .y(kong_y),
 				.state(kong_state),
 				.animation_state(kong_animation));
 
-	always@ (posedge clk_div[20]) begin
-		if(kong_animation == KONG_DROP) begin
-			drop_count <= drop_count + 1'b1;
-		end
+	always@ (posedge is_drop) begin
+		drop_count <= drop_count + 1'b1;
 	end
 
 	wire [9:0] queue_x;
@@ -144,7 +145,7 @@ module top(
 	generate
 		genvar target_index;
 		for(target_index = 0; target_index < BARREL_NUM_MAX; target_index = target_index + 1) begin: barrel_generator
-			barrel myBarrel(.clk(clk_div[20]),
+			barrel myBarrel(.clk(clk_div[18]),
 							.rst(cur_state == GAME_INITIAL),
 							.start((cur_state == GAME_RUNNING) & (target_index == drop_count)),
 							.over((cur_state == GAME_OVER) | (barrel_x[target_index] > 560 & barrel_y[target_index] > 410)),

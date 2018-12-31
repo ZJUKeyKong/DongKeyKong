@@ -94,8 +94,8 @@ module mario(
     localparam MARIO_HEIGHT = 9'd36,
 	           MARIO_WIDTH  = 10'd34;
 
-    localparam MOVSPEED_X = 3'd5,
-               MOVSPEED_Y = 6'd50,
+    localparam MOVSPEED_X = 3'd3,
+               MOVSPEED_Y = 6'd45,
                CLAMPSPEED = 3'd3,
                ACCELERATION_Y = 3'd3;
 
@@ -354,7 +354,7 @@ module mario(
                 end
             end
             MARIO_DYING: begin
-                case (animation_counter[2:1])
+                case (animation_counter[4:3])
                     2'b00: animation_state = MARIO_DIE1;
                     2'b01: animation_state = MARIO_DIE2;
                     2'b10: animation_state = MARIO_DIE3;

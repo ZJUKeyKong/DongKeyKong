@@ -97,7 +97,7 @@ module mario(
     localparam MOVSPEED_X = 3'd5,
                MOVSPEED_Y = 6'd50,
                CLAMPSPEED = 3'd3,
-               ACCELERATION_Y = 3'd2;
+               ACCELERATION_Y = 3'd3;
 
 //--------------------  to write ----------------------
 

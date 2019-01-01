@@ -31,7 +31,7 @@ module top(
 	assign start = 1'b1;
 	//assign over = 1'b0;
 	assign restart = SW[1];
-	assign success = 1'b0;
+	assign success = mario_y < 30 && (mario_x > 250 && mario_x < 350) && mario_state == 3'b100; //standing
 	
 	wire [9:0] x;
 	wire [8:0] y;
@@ -219,7 +219,7 @@ module top(
 		collision_sampler <= 128'b0;
 	end
 	assign collision = |mario_collision;
-	assign over = (~SW[0]) & (&collision_sampler);
+	assign over = (~SW[0]) & ((&collision_sampler) | (mario_x < 183 && mario_y < 114));
 	
 	always @(clk_div[20])
 	begin

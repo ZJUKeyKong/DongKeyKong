@@ -15,8 +15,10 @@ module top(
 	wire [31:0] clk_div;
 	wire [31:0] seg_data;
 	wire [4:0] movement;
+	wire [31:0] total_count;
+	reg [15:0] tmpsto;
 
-	assign seg_data = {16'hffff, 3'b000, collision, 3'b000, kong_state, 2'b00, kong_animation, drop_count};
+	//assign seg_data = {tmpsto, mario_collision};
 
 	localparam GAME_INITIAL = 2'b00,
                GAME_RUNNING = 2'b01,
@@ -141,6 +143,7 @@ module top(
 	wire [9:0] barrel_curwidth [0:BARREL_NUM_MAX - 1];
 	wire [8:0] barrel_curheight [0:BARREL_NUM_MAX - 1];
 	wire [15:0] barrel_color [0:BARREL_NUM_MAX - 1];
+	wire [10:0] barrel_count [0:BARREL_NUM_MAX - 1];
 
 	generate
 		genvar target_index;
@@ -161,30 +164,28 @@ module top(
 									  .posx(barrel_x[target_index]), .posy(barrel_y[target_index]),
 									  .animate_state(barrel_animation[target_index]),
 									  .color(barrel_color[target_index]));
+			score myScore(.clk(clk_div[1]),
+						  .rst(cur_state == GAME_INITIAL),
+						  .mario_posx(mario_x), .mario_posy(mario_y),
+						  .barrel_posx(barrel_x[target_index]), .barrel_posy(barrel_y[target_index]),
+						  .barrel_fall(barrel_animation[target_index][2] == 1'b1),
+						  .mario_jumping(mario_state == 3'b001),
+						  .count(barrel_count[target_index]));
 		end
 	endgenerate
-				  
-	// wire [9:0] barrel_x;
-	// wire [8:0] barrel_y;
-	// wire [1:0] barrel_state;
-    // wire [2:0] barrel_animation;
-	// wire [9:0] barrel_relative_x;
-	// wire [8:0] barrel_relative_y;
-
-	// assign barrel_relative_x = x - barrel_x;
-	// assign barrel_relative_y = y - barrel_y;
-
-	// assign barrel_width  = (barrel_animation[2] == 0) ?  BARREL_ROLL_WIDTH : BARREL_FALL_WIDTH;
-	// assign barrel_height = (barrel_animation[2] == 0) ? BARREL_ROLL_HEIGHT : BARREL_FALL_HEIGHT;
-
-	// barrel myBarrel(.clk(clk_div[20]),
-	// 			    .rst(cur_state == GAME_INITIAL), 
-	// 			    .start(cur_state == GAME_RUNNING), 
-	// 			    .over((cur_state == GAME_OVER) | (barrel_x > 560 & barrel_y > 410)),
-	// 				.x(barrel_x), .y(barrel_y),
-	// 				.state(barrel_state),
-	// 				.animation_state(barrel_animation));
-
+	
+	assign total_count = (barrel_count[0] + barrel_count[1] + barrel_count[2] + barrel_count[3] + barrel_count[4] + barrel_count[5] + barrel_count[6] + barrel_count[7] + barrel_count[8] + barrel_count[9] + barrel_count[10] + barrel_count[11] + barrel_count[12] + barrel_count[13] + barrel_count[14] + barrel_count[15]);
+	
+	assign
+        seg_data[ 3: 0] = 0,
+        seg_data[ 7: 4] = 0,
+        seg_data[11: 8] = total_count % 10,
+        seg_data[15:12] = total_count/     10 % 10,
+        seg_data[19:16] = total_count/    100 % 10,
+        seg_data[23:20] = total_count/   1000 % 10,
+        seg_data[27:24] = total_count/  10000 % 10,
+        seg_data[31:28] = total_count/ 100000 % 10;
+ 
 	reg [BARREL_NUM_MAX - 1 : 0] mario_collision;
 	wire collision;
 	generate
@@ -212,9 +213,22 @@ module top(
 			end
 		end
 	endgenerate
-
+	
+	reg[127:0] collision_sampler;
+	initial begin
+		collision_sampler <= 128'b0;
+	end
 	assign collision = |mario_collision;
-	assign over = collision;
+	assign over = (~SW[0]) & (&collision_sampler);
+	
+	always @(clk_div[20])
+	begin
+		collision_sampler <= {collision_sampler[126:0], collision};
+	end
+	
+	always@ (posedge clk) begin
+		tmpsto <= collision ? mario_collision : tmpsto ;
+	end
 
 
 	wire [15:0] background_img;

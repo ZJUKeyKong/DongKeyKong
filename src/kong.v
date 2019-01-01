@@ -24,7 +24,7 @@ module kong(
                KONG_INITIAL_Y = 79;
     
     reg next_state;
-    reg [6:0] animation_counter;
+    reg [7:0] animation_counter;
 
     assign x = KONG_INITIAL_X;
     assign y = KONG_INITIAL_Y;
@@ -46,7 +46,7 @@ module kong(
                 animation_state = KONG_NORMAL;
             end
             KONG_PLAYING: begin
-                case (animation_counter[6:4])
+                case (animation_counter[7:5])
                     3'b101: begin
                         is_drop = 0;
                         animation_state = KONG_GET;

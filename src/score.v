@@ -7,8 +7,8 @@ module score(
     input wire mario_jumping,
     output reg[10:0] count
 );
-    localparam[1:0] same_floor_no_intersection = 2'b01,
-        different_floor = 2'b00, same_floor_with_intersection = 2'b10, goal = 2'b11;
+    localparam[2:0] same_floor_no_intersection = 3'b001, start = 3'b000,
+        different_floor = 3'b010, same_floor_with_intersection = 3'b011, goal = 3'b100;
     localparam[9:0] mario_width = 34, barrel_fall_width = 42, barrel_roll_width = 32;
     localparam[8:0] mario_height = 36, barrel_height = 24, jump_height = 60;
 
@@ -17,7 +17,7 @@ module score(
     wire[9:0] barrel_posx1,barrel_posx2,mario_posx1,mario_posx2;
     wire[8:0] barrel_bottom, mario_bottom;
     reg[10:0] count_next;
-    reg[1:0] state, state_next;
+    reg[2:0] state, state_next;
 
     initial begin
         count_next <= 0;
@@ -41,9 +41,7 @@ module score(
         if(rst)
         begin
             count <= 0;
-            count_next <= 0;
-            state <= 0;
-            state_next <= 0;
+            state <= start;
         end
         else begin
             count <= count_next;
@@ -51,25 +49,41 @@ module score(
         end
     end
 
-    always @*
-    begin
+    always @(*) begin
         case (state)
-          different_floor:
-            if(same_floor) 
+			 start:
+			 begin
+				count_next <= 0;
+				if(same_floor)
                 state_next <= intersection ? same_floor_with_intersection : same_floor_no_intersection;
             else
                 state_next <= different_floor;
-          same_floor_no_intersection:
+			 end
+          different_floor:
+			 begin
+				count_next <= count;
             if(same_floor)
                 state_next <= intersection ? same_floor_with_intersection : same_floor_no_intersection;
             else
                 state_next <= different_floor;
+			 end
+          same_floor_no_intersection:
+			 begin
+				count_next <= count;
+            if(same_floor)
+                state_next <= intersection ? same_floor_with_intersection : same_floor_no_intersection;
+            else
+                state_next <= different_floor;
+			 end
           same_floor_with_intersection:  
+			 begin
+				count_next <= count;
             if(same_floor)
                 state_next <=  intersection ? same_floor_with_intersection :
                  (mario_jumping ? goal : same_floor_no_intersection);
             else
                 state_next <= different_floor;
+			 end
           goal: 
             begin
                 count_next <= count + 1;

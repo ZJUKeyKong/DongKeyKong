@@ -1,23 +1,23 @@
 `timescale 1ns / 1ps
 
 module queue(
-    input wire clk,
-    input wire rst,
-    input wire start,
-    input wire over,
-    output wire [9:0] x,
-    output wire [8:0] y,
-    output reg state,
-    output reg animation_state
+    input wire clk,  //clock signal
+    input wire rst,  //reset signal 
+    input wire start,//start signal
+    input wire over, //over signal
+    output wire [9:0] x, //queue position x
+    output wire [8:0] y,  ///queue position y
+    output reg state,  //queue state
+    output reg animation_state  //queue animation
     );
 
-    localparam QUEUE_INITIAL = 1'b0,
+    localparam QUEUE_INITIAL = 1'b0,  //queen state
                QUEUE_PLAYING = 1'b1;
 
-    localparam QUEUE_LEFT  = 1'b0,
+    localparam QUEUE_LEFT  = 1'b0, //queen animation state
                QUEUE_RIGHT = 1'b1;
     
-    localparam QUEUE_INITIAL_X = 280,
+    localparam QUEUE_INITIAL_X = 280,  //queen position
                QUEUE_INITIAL_Y = 27;
     
     reg next_state;
@@ -37,7 +37,7 @@ module queue(
         state <= next_state;
     end
 
-    always@ (posedge clk) begin
+    always@ (posedge clk) begin  //queen animation state switch
         case(state)
             QUEUE_INITIAL: begin
                 animation_state = QUEUE_RIGHT;
@@ -52,7 +52,7 @@ module queue(
         endcase
     end
 
-    always@ (*) begin
+    always@ (*) begin  //queen state transform
         next_state = state;
         case(state)
             QUEUE_INITIAL: begin

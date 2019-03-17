@@ -4,13 +4,13 @@
 // Engineer: 
 // 
 // Create Date: 2018/12/30 20:56:51
-// Design Name: 
+// Design Name: characterColor
 // Module Name: characterColor
-// Project Name: 
+// Project Name: DonkeyKong
 // Target Devices: 
 // Tool Versions: 
 // Description: 
-// 
+//     The module controing the display of characters
 // Dependencies: 
 // 
 // Revision:
@@ -25,19 +25,19 @@ module characterColor(
     input wire[3:0] mario_state,
     input wire[1:0] kong_state,
     input wire queue_state,
-    //input wire[2:0] barrel_state,
-    input wire[9:0] col, mario_posx, queue_posx, kong_posx,// barrel_posx,
-    input wire[8:0] row, mario_posy, queue_posy, kong_posy,// barrel_posy,
+    input wire[9:0] col, mario_posx, queue_posx, kong_posx,
+    input wire[8:0] row, mario_posy, queue_posy, kong_posy,
     output wire[11:0] color
     );
     
     localparam[15:0] white = 16'hffff, black = 16'h0000;
-    wire[15:0] mcolor, kcolor, qcolor;//, bcolor;
+    wire[15:0] mcolor, kcolor, qcolor;
+   // If overlapping between character happens, this module will decide which character to display according to the priority of character
+   //Mario > Queen > Kong
     assign color = &mcolor ? (&qcolor ? (&kcolor ? black : kcolor[15:4]) : qcolor[15:4]) : mcolor[15:4]; 
-    //wire[15:0] bcolor;
+   // Load the color from each character, if the character won't be displayed on given pixel, a 'FFFF' will return.
     kongColor kong(.clk(clk),.color(kcolor), .row(row), .col(col), .animate_state(kong_state), .posx(kong_posx), .posy(kong_posy));
     queueColor queue(.clk(clk),.color(qcolor), .row(row), .col(col), .animate_state(queue_state), .posx(queue_posx), .posy(queue_posy));
     marioColor mario(.clk(clk),.color(mcolor), .row(row), .col(col), .animate_state(mario_state), .posx(mario_posx), .posy(mario_posy));
-    //barrelColor barrel(.clk(clk), .color(bcolor), .row(row), .col(col), .animate_state(barrel_state), .posx(barrel_posx), .posy(barrel_posy));
 
 endmodule

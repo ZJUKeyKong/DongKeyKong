@@ -1,5 +1,6 @@
 `timescale 1ns / 1ps
-
+//The module outputs the color of Mario displaying on screen
+//The logic of Design is the same as 'QueueColor.v'
 module marioColor(
     input wire clk,
     input wire[9:0] col,//scan signal from vgac

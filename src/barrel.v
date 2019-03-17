@@ -1,34 +1,38 @@
 `timescale 1ns / 1ps
-
+/*
+Barrel state machine.
+Barrel have 3 state and 6 animation.
+Mind the position of each land and ladder.
+*/
 
 module barrel(
-    input wire clk,
-    input wire rst,
-    input wire start,
-    input wire over,
-    output reg [9:0] x,
-    output reg [8:0] y,
-    output reg [1:0] state,
-    output reg [2:0] animation_state
+    input wire clk,  //clock signal
+    input wire rst,  //reset signal
+    input wire start,//start signal
+    input wire over, //over  signal
+    output reg [9:0] x,  //barrel position x
+    output reg [8:0] y,  //barrel position y
+    output reg [1:0] state,  //barrel state
+    output reg [2:0] animation_state  //barrel animation
     );
 
-    localparam BARREL_INITIAL = 2'b00,
-               BARREL_ROLLING = 2'b01,
-               BARREL_FALLING = 2'b10;
+    localparam BARREL_INITIAL = 2'b00,  //barrel_inital state
+               BARREL_ROLLING = 2'b01,  //barrel rolling state
+               BARREL_FALLING = 2'b10;  //barrel falling state
 
-    localparam BARREL_ROLL1 = 3'b000,
+    localparam BARREL_ROLL1 = 3'b000,   //4 roll state
                BARREL_ROLL2 = 3'b001,
                BARREL_ROLL3 = 3'b010,
                BARREL_ROLL4 = 3'b011,
-               BARREL_FALL1 = 3'b100,
+               BARREL_FALL1 = 3'b100,   //2 fall state
                BARREL_FALL2 = 3'b101;
 
-    localparam TOP_BOARD = 9'd5,
+    localparam TOP_BOARD = 9'd5,        //map border
                BOTTOM_BOARD = 9'd461,
                LEFT_BOARD = 10'd5,
                RIGHT_BOARD = 10'd640;
 
-    localparam land0lx = 10'd250,
+    localparam land0lx = 10'd250,   //land info
                land0ly =  9'd53,
                land0rx = 10'd388,
                land0ry =  9'd70,
@@ -53,7 +57,7 @@ module barrel(
                land5rx = 10'd640,
                land5ry =  9'd479;
 
-    localparam ladder0lx = 10'd337,
+    localparam ladder0lx = 10'd337,  //ladder info
                ladder0ly =  9'd27,
                ladder0rx = 10'd347,
                ladder0ry =  9'd48,
@@ -74,15 +78,15 @@ module barrel(
                ladder4rx = 10'd61,
                ladder4ry =  9'd371;
     
-    localparam BARREL_INITIAL_X = 10'd203,
+    localparam BARREL_INITIAL_X = 10'd203,  //barrel initial pos
                BARREL_INITIAL_Y =  9'd90;
 
-    localparam BARREL_FALL_WIDTH  = 10'd42,
+    localparam BARREL_FALL_WIDTH  = 10'd42,  //barrel size define
                BARREL_FALL_HEIGHT = 9'd24,
                BARREL_ROLL_WIDTH  = 10'd32,
                BARREL_ROLL_HEIGHT = 9'd24;
 
-    localparam MOVSPEED_X = 3'd1,
+    localparam MOVSPEED_X = 3'd1,  //barrel movement define
                MOVSPEED_Y = 3'd1,
                accumulate_Y = 1'b0;
 
@@ -91,6 +95,7 @@ module barrel(
     wire [31:0] randnumber;
     wire RAND_MATCH;
 
+    //collision check
     assign COLLATION_DOWN = (y + BARREL_FALL_HEIGHT >= BOTTOM_BOARD) | 
                             ((x < land0rx & x + BARREL_FALL_WIDTH > land0lx) & (y + BARREL_FALL_HEIGHT >= land0ly & y + BARREL_FALL_HEIGHT <= land0ry)) |
                             ((x < land1rx & x + BARREL_FALL_WIDTH > land1lx) & (y + BARREL_FALL_HEIGHT >= land1ly & y + BARREL_FALL_HEIGHT <= land1ry)) |
@@ -99,12 +104,14 @@ module barrel(
                             ((x < land4rx & x + BARREL_FALL_WIDTH > land4lx) & (y + BARREL_FALL_HEIGHT >= land4ly & y + BARREL_FALL_HEIGHT <= land4ry)) |
                             ((x < land5rx & x + BARREL_FALL_WIDTH > land5lx) & (y + BARREL_FALL_HEIGHT >= land5ly & y + BARREL_FALL_HEIGHT <= land5ry));
 
+    //ladder check
     assign EN_FALL = (x >= ladder0lx & x <= ladder0rx & y >= ladder0ly & y <= ladder0ry) |
                      (x >= ladder1lx & x <= ladder1rx & y >= ladder1ly & y <= ladder1ry) |
                      (x >= ladder2lx & x <= ladder2rx & y >= ladder2ly & y <= ladder2ry) |
                      (x >= ladder3lx & x <= ladder3rx & y >= ladder3ly & y <= ladder3ry) |
                      (x >= ladder4lx & x <= ladder4rx & y >= ladder4ly & y <= ladder4ry);
 
+    //check ladder fall or land fall
     rand_gen m20(.clk(clk), .rand(randnumber));
     assign RAND_MATCH = randnumber[3:2] == 2'b10;
 
@@ -116,7 +123,7 @@ module barrel(
     reg [1:0] next_state;
     reg [4:0] animation_counter;
     
-    initial begin
+    initial begin  //initalize
         x = BARREL_INITIAL_X;
         y = BARREL_INITIAL_Y;
         SPEED_X = MOVSPEED_X;
@@ -136,7 +143,7 @@ module barrel(
                 SPEED_X <= MOVSPEED_X;
                 SPEED_Y <= 0;
             end
-            BARREL_ROLLING: begin
+            BARREL_ROLLING: begin  //check map border
                 if(x + BARREL_ROLL_WIDTH + SPEED_X > RIGHT_BOARD) begin
                     x <= RIGHT_BOARD - BARREL_ROLL_WIDTH;
                     SPEED_X <= -MOVSPEED_X;
@@ -151,7 +158,7 @@ module barrel(
                 SPEED_Y <= 0;
                 animation_counter <= animation_counter + 1'b1;
             end
-            BARREL_FALLING: begin
+            BARREL_FALLING: begin  //check collision with land
                 if(y + BARREL_FALL_HEIGHT + SPEED_Y > BOTTOM_BOARD) begin
                     y <= BOTTOM_BOARD - BARREL_FALL_HEIGHT;
                     SPEED_Y <= 0;
@@ -180,17 +187,17 @@ module barrel(
                     y <= land5ly - BARREL_FALL_HEIGHT;
                     SPEED_Y <= 0;
                 end
-                else begin
+                else begin  //fall by speed
                     y <= y + SPEED_Y;
                 end
                 // SPEED_X <= 0;
-                SPEED_Y <= MOVSPEED_Y;
+                SPEED_Y <= MOVSPEED_Y;  //speed when fall
                 animation_counter <= animation_counter + 1'b1;
             end
         endcase
     end
 
-    always@ (*) begin
+    always@ (*) begin  //animation state switch to form animation
         case(state)
             BARREL_FALLING: begin
                 case (animation_counter[4])
@@ -209,7 +216,7 @@ module barrel(
         endcase
     end
 
-    always@ (*) begin
+    always@ (*) begin  //barrel state transform
         next_state = state;
         case(state)
             BARREL_INITIAL: begin

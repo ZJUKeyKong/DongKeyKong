@@ -1,5 +1,5 @@
 //Send ps2 port and clk to this module
-//This module will return the state for movement
+//This module will return the state for movement of Mario
 module key2state(
     input wire clk,rst,
     input wire ps2c, ps2d,

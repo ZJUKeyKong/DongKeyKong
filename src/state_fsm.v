@@ -1,5 +1,8 @@
 `timescale 1ns / 1ps
-
+/*
+Game state finish state machine
+Game have 4 state to determine which scene to display
+*/
 module state_fsm(
     input wire clk,
     input wire start,
@@ -9,14 +12,14 @@ module state_fsm(
     output reg [1:0] state
     );
 
-    localparam GAME_INITIAL = 2'b00,
+    localparam GAME_INITIAL = 2'b00,  //Game state
                GAME_RUNNING = 2'b01,
                GAME_OVER    = 2'b10,
                GAME_SUCCESS = 2'b11;
 
     reg [1:0] next_state;
 
-    initial begin
+    initial begin  //initialize
         next_state = GAME_INITIAL;
     end
 
@@ -24,7 +27,7 @@ module state_fsm(
         state <= next_state;
     end
 
-    always@ (*) begin
+    always@ (*) begin  //Game state tranform
         next_state = state;
         case (state)
             GAME_INITIAL: begin

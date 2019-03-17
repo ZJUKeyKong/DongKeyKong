@@ -1,5 +1,7 @@
 `timescale 1ns / 1ps
-
+/*
+ClkDiv: To divide 
+*/
 module clkdiv(
     input wire clk,
     input wire rst,

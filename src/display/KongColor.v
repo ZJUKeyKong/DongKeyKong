@@ -1,3 +1,5 @@
+//The module outputs the color of Kong displaying on screen
+//The logic of Design is the same as 'QueueColor.v'
 module kongColor(
     input wire clk,
     input wire[9:0] col,//scan signal from vgac
